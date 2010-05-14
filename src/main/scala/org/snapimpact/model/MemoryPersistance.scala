@@ -1,7 +1,7 @@
 package org.snapimpact
 package model
 
-import org.snapimpact.etl.model.dto.VolunteerOpportunity
+import org.snapimpact.etl.model.dto.{VolunteerOpportunity, DateTimeDuration}
 
 import net.liftweb._
 import util.Helpers
@@ -104,6 +104,7 @@ private class MemoryGeoStore extends GeoStore {
    */
   def find(location: GeoLocation,
            radius: Double,
+           filter: GUID => Boolean,
            first: Int,
            max: Int): List[(GUID, Double)] =
 	     {
@@ -111,7 +112,7 @@ private class MemoryGeoStore extends GeoStore {
                
                val view: List[(GUID, Double)] = 
                  for {
-                   (guid, locs) <- set.toList
+                   (guid, locs) <- set.toList if filter(guid)
                    loc <- locs
                    distance <- loc.distanceFrom(location) if distance <= radius
                  } yield guid -> distance
@@ -128,6 +129,64 @@ private class MemoryGeoStore extends GeoStore {
       set.view.drop(first).take(max).toList
     }
 }
+
+
+private object MemoryDateTimeStore extends MemoryDateTimeStore
+
+/**
+ * The interface to the Date Time filter search
+ */
+private class MemoryDateTimeStore extends DateTimeStore {
+  private var info: Map[GUID, List[DateTimeDuration]] = Map()
+
+  /**
+   * Assocate the GUID and times
+   */
+  def add(guid: GUID, times: List[DateTimeDuration]): Unit = 
+    synchronized {
+      info += guid -> times
+    }
+
+  /**
+   * Unassocate the GUID and the times
+   */
+  def remove(guid: GUID): Unit = 
+    synchronized {
+      info -= guid
+    }
+
+  /**
+   * Update the times of a given GUID
+   */
+  def update(guid: GUID, times: List[DateTimeDuration]): Unit =
+    add(guid, times)
+
+  /**
+   * Find a series GUIDs that are in the time/date range.
+   * Return the GUID and millis until start
+   */
+  def find(start: Long, end: Long): List[(GUID, Long)] = Nil
+
+  /**
+   * Test if the GUID is in the date range
+   */
+  def test(start: Long, end: Long)(guid: GUID):Boolean = {
+    def testIt(it: DateTimeDuration): Boolean = {
+      (it.startDate, it.endDate) match {
+        case (Some(st), Some(en)) => start < en && end >= st
+        case (_, Some(en)) => start < en
+        case (Some(st), _) => end >= st
+        case _ => true
+      }
+    }
+
+    (for {
+      lst <- synchronized(info).get(guid)
+      i <- lst.find(testIt _)
+    } yield true) getOrElse false
+  }
+}
+
 
 /**
  * The in-memory implementation of the tag store
@@ -292,6 +351,7 @@ private class MemoryLuceneStore extends SearchStore {
    * return
    */
   def find(search: String,
+           filter: GUID => Boolean,
            first: Int = 0, max: Int = 200,
            inSet: Option[Seq[GUID]] = None): List[(GUID, Double)]
   = {
@@ -308,16 +368,16 @@ private class MemoryLuceneStore extends SearchStore {
       
       searcher.search(q, collector)
       
-      val hits = collector.topDocs().scoreDocs.drop(first)
+      val hits = collector.topDocs().scoreDocs// .drop(first)
 
       val ret = for {
 	h <- hits.toList
-	doc <- Box !! searcher.doc(h.doc, new MapFieldSelector("guid"))
-	guid <- Box !! doc.getField("guid")
-	value <- Box !! guid.stringValue
-      } yield GUID(value) -> h.score.toDouble
+	doc <- (Box !! searcher.doc(h.doc, new MapFieldSelector("guid"))).toList
+	guid <- (Box !! doc.getField("guid")).toList
+	value <- (Box !! guid.stringValue).map(GUID.apply).toList if filter(value)
+      } yield value -> h.score.toDouble
 
-      ret
+      ret.drop(first).take(max)
     } catch {
       case pe: org.apache.lucene.queryParser.ParseException => Nil
     }

@@ -33,15 +33,15 @@ class SearchStoreSpec extends Specification {
     "Support storing and searching" in {
       searchStore.add(guid1, "I like to eat fruit")
       
-      searchStore.find("eat").map(_._1) must_== List(guid1)
+      searchStore.find("eat", x => true).map(_._1) must_== List(guid1)
     }
 
     "Searching works with a second record" in {
       searchStore.add(guid1, "I like to eat fruit")
       searchStore.add(guid2, "Moose are my favorite fruit")
       
-      searchStore.find("eat").take(1).map(_._1) must_== List(guid1)
-      searchStore.find("fruit").length must_== 2
+      searchStore.find("eat", x => true).take(1).map(_._1) must_== List(guid1)
+      searchStore.find("fruit", x => true).length must_== 2
     }
 
 
@@ -52,7 +52,7 @@ class SearchStoreSpec extends Specification {
 
       searchStore.add(guid, item)
 
-      searchStore.find("quest").length must_== 1
+      searchStore.find("quest", x => true).length must_== 1
     }
   }
 }

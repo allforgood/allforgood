@@ -16,6 +16,8 @@ import org.snapimpact.model._
 
 import org.slf4j.LoggerFactory
 import net.liftweb.util._
+import org.joda.time.{DateTime => JTD}
+
 
 class FootprintSpecTest extends Runner(new FootprintSpecs) with JUnit with Console
 
@@ -31,8 +33,9 @@ class FootprintSpecs extends Specification
       <openEnded>No</openEnded> <startDate>2009-02-22</startDate> <endDate>2009-02-22</endDate> <startTime>18:45:00</startTime> <endTime>21:00:00</endTime>
       </dateTimeDuration>
       val item = DateTimeDuration.fromXML(subject)
-      item.openEnded.get must beEqualTo(No);
-      item.startDate.get.dayOfMonth.get mustEqual 22
+      item.openEnded.get must beEqualTo(No)
+
+      (new JTD(item.startDate.get)).dayOfMonth.get mustEqual 22
       item.endTime.get.olsonTZ must beNone
     }
 
@@ -41,8 +44,8 @@ class FootprintSpecs extends Specification
       val dur = DateTimeDuration.fromXML(<dateTimeDuration>
                                          <openEnded>No</openEnded> <startDate>2010-03-03</startDate> <endDate>2010-03-21</endDate> <startTime>18:55:00</startTime> <endTime>20:20:00</endTime>
                                          </dateTimeDuration>)
-      dur.startDate.get.monthOfYear.get mustEqual 3
-      dur.endDate.get.monthOfYear.get mustEqual 3
+      (new JTD(dur.startDate.get)).monthOfYear.get mustEqual 3
+      (new JTD(dur.endDate.get)).monthOfYear.get mustEqual 3
     }
 
     "Parse organization info from XML" in
@@ -132,7 +135,7 @@ class FootprintSpecs extends Specification
         val item = FeedInfo.fromXML(feedInfo)
         item.providerID mustEqual "1"
         item.providerName must equalIgnoreCase("Volunteer Match")
-        item.createdDateTime.getDayOfMonth mustEqual 30
+        (new JTD(item.createdDateTime)).getDayOfMonth mustEqual 30
       }
 
       "Parse Volunteer Opportunities from XML" in
@@ -238,7 +241,7 @@ class FootprintSpecs extends Specification
         val guid = GUID.create
         db.add(guid, item.opportunities.opps.head)
 
-        val memitem = db.find("MicroMentor")
+        val memitem = db.find("MicroMentor", x => true)
 
         memitem must notBeNull
 

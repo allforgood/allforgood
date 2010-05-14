@@ -15,26 +15,24 @@ object PersistenceFactory extends Factory {
   val searchStore = new FactoryMaker[SearchStore](() => MemoryLuceneStore){} 
 
   val store = new FactoryMaker[Store](DefaultStore){}
-}
 
-object Timeperiod extends Enumeration {
-  val Today = Value(1, "Today")
-  val ThisMonth = Value(2, "This Month")
-  val ThisWeekend = Value(3, "This Weekend")
-  val ThisWeek = Value(4, "This Week")
+  val dateTimeStore = new FactoryMaker[DateTimeStore](() => MemoryDateTimeStore){}
 }
 
 trait Store {
-  private lazy val store = PersistenceFactory.opportunityStore.vend
-  private lazy val geo = PersistenceFactory.geoStore.vend
-  private lazy val tag = PersistenceFactory.tagStore.vend
-  private lazy val search = PersistenceFactory.searchStore.vend
+  import java.util.Date
+
+  protected def store: OpportunityStore
+  protected def geo: GeoStore
+  protected def tag: TagStore
+  protected def search: SearchStore
+  protected def dateTime: DateTimeStore
 
   def add(op: VolunteerOpportunity): GUID = {
     val guid = store.create(op)
     geo.add(guid, op)
     tag.add(guid, op)
-
+    dateTime.add(guid, op)
     search.add(guid, op)
 
     guid
@@ -44,12 +42,24 @@ trait Store {
              start: Int = 0,
              num: Int = 100,
              provider: Option[String] = None,
-             timeperiod: Option[Timeperiod.Value] = None,
+             timeperiod: Option[(Date, Date)] = None,
              loc: Option[GeoLocation] = None,
              radius: Double = 50): List[(GUID, Double)] 
   = {
+    import Helpers._
+
+    val (startDate, endDate) = timeperiod match {
+      case Some((st, en)) if st.getTime >= millis &&
+      st.getTime > en.getTime => st -> en
+      case _ => (1.day.later.noTime) -> (1000.days.later.noTime)
+      }
+
+    val filter: GUID => Boolean = dateTime.test(startDate.getTime,
+                                                endDate.getTime) _
+
     def geoFind(geoLocation: GeoLocation, start: Int, num: Int) = 
       geo.find(location = geoLocation, 
+               filter = filter,
                distance = radius,
                first = start,
                max = num).map
@@ -79,7 +89,7 @@ trait Store {
     }
       
     (query, loc) match {
-      case (Some(q), None) => search.find(q, start, num)
+      case (Some(q), None) => search.find(q, filter, start, num)
       
       case (None, Some(geoLocation)) => {
         geoFind(geoLocation, start, num).sortWith {
@@ -89,7 +99,7 @@ trait Store {
 
 
       case (Some(q), Some(geoLocation)) => {
-        val qr = search.find(q, 0, (start+ num) * 10)
+        val qr = search.find(q, filter, 0, (start+ num) * 10)
         
         merge(qr,
               geoFind(geoLocation, 0, (start + num) * 10)).drop(start).take(num)
@@ -116,7 +126,15 @@ trait Store {
   }
 }
 
-private object DefaultStore extends Store
+private object DefaultStore extends Store {
+
+  protected lazy val store = PersistenceFactory.opportunityStore.vend
+  protected lazy val geo = PersistenceFactory.geoStore.vend
+  protected lazy val tag = PersistenceFactory.tagStore.vend
+  protected lazy val search = PersistenceFactory.searchStore.vend
+  protected lazy val dateTime = PersistenceFactory.dateTimeStore.vend
+
+}
 
 
 /**
@@ -229,6 +247,7 @@ trait GeoStore {
    * specified location
    */
   def find(location: GeoLocation, distance: Double,
+           filter: GUID => Boolean,
            first: Int = 0, max: Int = 200): List[(GUID, Double)]
 
   /**
@@ -236,6 +255,38 @@ trait GeoStore {
    */
   def findNonLocated(first: Int = 0, max: Int = 200): List[GUID]
 }
+
+/**
+ * The interface to the Date Time filter search
+ */
+trait DateTimeStore {
+  /**
+   * Assocate the GUID and times
+   */
+  def add(guid: GUID, times: List[DateTimeDuration]): Unit
+
+  /**
+   * Unassocate the GUID and the times
+   */
+  def remove(guid: GUID): Unit
+
+  /**
+   * Update the times of a given GUID
+   */
+  def update(guid: GUID, times: List[DateTimeDuration]): Unit
+
+  /**
+   * Find a series GUIDs that are in the time/date range.
+   * Return the GUID and millis until start
+   */
+  def find(start: Long, end: Long): List[(GUID, Long)]
+
+  /**
+   * Test if the GUID is in the date range
+   */
+  def test(start: Long, end: Long)(guid: GUID):Boolean
+}
+
 
 case class Tag(tag: String) extends Ordered[Tag] {
   def compare(other: Tag) = tag compare other.tag
@@ -296,6 +347,7 @@ trait SearchStore {
    * return
    */
   def find(search: String,
+           filter: GUID => Boolean,
            first: Int = 0, max: Int = 200,
            inSet: Option[Seq[GUID]] = None): List[(GUID, Double)]
 }

@@ -64,13 +64,13 @@ class APISpec extends Specification with ApiSubmitTester with RequestKit
       searchForHunger
     }
     "search for specific dates" in {
-      SkipHandler {
-        searchForSpecificDates
-      }
+      searchForSpecificDates
     }
+
     "search for zip code" in {
       searchForZip
     }
+
     "search for date then zip code" in {
       searchForDateThenZip
     }

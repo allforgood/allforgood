@@ -16,6 +16,16 @@ final case object RssOutputType extends OutputType
 final case object HtmlOutputType extends OutputType
 
 object Api {
+  import java.util.Date
+
+  def asDate(in: String): Box[Date] = {
+    import java.text._
+
+    Helpers.tryo {
+      (new SimpleDateFormat("yyyy-MM-dd")).parse(in)
+    }
+  }
+
   def volopps(r: Req): LiftResponse = {
     try {
     for{
@@ -36,13 +46,50 @@ object Api {
       openOr(50)
 
       val store = PersistenceFactory.store.vend
+
+      val startDate = r.param("vol_startdate").map(_.trim).flatMap(asDate)
+      val endDate = r.param("vol_enddate").map(_.trim).flatMap(asDate)
+
+      val timeperiod = r.param("timeperiod").map(_.trim.toLowerCase)
+
+      import Helpers._
+
+      def isFriday(d: Date): Boolean = {
+        import java.util._
+        val utc = TimeZone.getTimeZone("UTC")
+        val cal = Calendar.getInstance(utc)
+        cal.setTimeInMillis(d.getTime)
+        cal.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY
+      }
+
+      def incTilFriday(d: Date): Date = {
+        if (isFriday(d)) d
+        else incTilFriday(1.day + d.getTime)
+      }
+
+      val timespan: (Date, Date) = (timeperiod, startDate, endDate) match {
+        case (Full("today"), _, _) => 0.days.later -> 1.day.later
+        case (Full("this_week"), _, _) => 0.days.later -> 7.days.later
+        case (Full("this_weekend"), _, _) => {
+          val friday = incTilFriday(0.days.later.noTime)
+          friday -> (3.days + friday.getTime)
+        }
+
+        case (Full("this_month"), _, _) => 0.days.later -> 30.days.later
+        case (_, Full(s), Full(e)) => s -> e
+        case _ => 1.day.later.noTime -> 1000.days.later.noTime
+      }
+
+
       val res = store.read(store.search(query = r.param("q").map(_.trim).
                                         filter(_.length > 0),
                                         loc = loc,
+                                        timeperiod = Some(timespan),
                                         start = start - 1,
                                         num = num,
                                         radius = radius
                                       ))
+
 
       r.param("output") match {
         case Full("json") =>
@@ -58,7 +105,7 @@ object Api {
       }
     }
     } catch {
-      case e => e.printStackTrace ; System.exit(0); throw e
+      case e => e.printStackTrace ; throw e
     }
   }
 

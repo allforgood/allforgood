@@ -22,7 +22,9 @@ class GeoStoreSpec extends Specification {
       val geoLoc3 = GeoLocation(47.0,3.0)
       geoStore.add( guid, geoLoc1 :: geoLoc2 :: geoLoc3 :: Nil)
       
-      val found = geoStore.find( geoLoc1, 2.0, 0, 50)
+      val found = geoStore.find( geoLoc1, 2.0,
+                                x => true,
+                                0, 50)
 
       found.map(_._1).filter(_ == guid) must_== List(guid)
     }

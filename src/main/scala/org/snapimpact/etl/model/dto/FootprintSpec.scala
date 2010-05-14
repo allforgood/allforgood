@@ -2,7 +2,7 @@ package org.snapimpact
 package etl.model.dto
 
 import org.snapimpact.etl.model.DataModel
-import org.joda.time.DateTime
+import org.joda.time.{DateTime => JTD}
 import xml.Node
 import net.liftweb.util.Helpers
 import net.liftweb.common._
@@ -68,11 +68,23 @@ object ParseHelper {
   implicit def cvtSexRestrictedEnum: Node => Option[SexRestrictedEnum] =
     n => SexRestrictedEnum.fromXML(n)
 
+  import java.util.Date
+  import Helpers._
+  
+  def asDate(in: String): Option[Date] = {
+    import java.text._
+
+    Helpers.tryo {
+      (new SimpleDateFormat("yyyy-MM-dd")).parse(in)
+    }
+  }
+
+
   implicit def cvtDTOlson: Node => Option[DateTimeOlsonDefaultPacific] =
     n => Some(DateTimeOlsonDefaultPacific(n.text))
 
-  implicit def cvtDateTime: Node => Option[DateTime] =
-    n => Some(new DateTime(n.text))
+  implicit def cvtDateTime: Node => Option[Long] =
+    n => asDate(n.text).map(_.noTime.getTime) // Some((new JTD(n.text)).getMillis)
 
   implicit def cvtDuration: Node => Option[Duration] =
     n => Some(new Duration(n.text))
@@ -138,7 +150,7 @@ case class FeedInfo(
     providerID: String,
     providerName: String,
     feedID: Option[String],
-    createdDateTime: DateTime,
+    createdDateTime: Long,
     providerURL: Option[String],
     termsOfUse:Option[String],
     description:Option[String]) extends DataModel
@@ -149,7 +161,7 @@ object FeedInfo {
       (node \ "providerID").text,
       (node \ "providerName").text,
       node % "feedID",
-      new DateTime((node \ "createdDateTime").text),
+      (new JTD((node \ "createdDateTime").text)).getMillis,
       node % "providerURL",
       node % "termsOfUse",
       node % "description")
@@ -321,6 +333,9 @@ object VolunteerOpportunity {
     (in.audienceTags.map(Tag.apply) :::
      in.categoryTags.map(Tag.apply)).removeDuplicates
 
+  implicit def voToDateTime(in: VolunteerOpportunity): List[DateTimeDuration] = 
+    in.dateTimeDurations
+
   def fromXML(orgMap: Map[String, Organization], 
               node: scala.xml.Node) = {
     
@@ -342,7 +357,8 @@ object VolunteerOpportunity {
       volunteersNeeded = node % "volunteersNeeded",
       rsvpCount = node % "rsvpCount",
       dateTimeDurations =
-	(node \ "dateTimeDurations").toList.map(DateTimeDuration.fromXML(_)),
+	(node \ "dateTimeDurations").toList.flatMap(n =>
+          (n \ "dateTimeDuration").toList.map(DateTimeDuration.fromXML(_))),
       locations = (node \ "locations").toList.flatMap(
         x =>
           (x \ "location").map(Location.fromXML(_))
@@ -392,8 +408,8 @@ object Review {
 
 case class DateTimeDuration(
   openEnded:Option[YesNoEnum],
-  startDate:Option[DateTime],
-  endDate:Option[DateTime],
+  startDate:Option[Long],
+  endDate:Option[Long],
   iCalRecurrence:Option[String],
   duration:Option[Duration],
   startTime:Option[TimeOlson],
