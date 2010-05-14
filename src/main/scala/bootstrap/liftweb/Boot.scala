@@ -14,9 +14,10 @@ import net.liftweb.mapper.{DB,
 			   StandardDBVendor}
 import java.sql.{Connection, DriverManager}
 import scala.xml.NodeSeq
+import org.joda.time._
 import org.snapimpact.model._
 import org.snapimpact.snippet._
-import org.snapimpact.lib.{MenuData}
+import org.snapimpact.lib.{MenuData, AfgDate}
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -39,6 +40,9 @@ class Boot {
       DB.defineConnectionManager(DefaultConnectionIdentifier, vendor)
     }
 
+    if (Props.testMode) {
+      AfgDate.calcDateTimeFunc = Some(() => new DateTime("2008-12-28"))
+    }
     
     LiftRules.passNotFoundToChain = false
 

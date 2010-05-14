@@ -3,6 +3,9 @@ package model
 
 import org.snapimpact.etl.model.dto._
 
+import org.joda.time._
+import org.snapimpact.lib.AfgDate._
+
 import net.liftweb.util._
 import net.liftweb.common._
 import net.liftweb.http._
@@ -20,8 +23,6 @@ object PersistenceFactory extends Factory {
 }
 
 trait Store {
-  import java.util.Date
-
   protected def store: OpportunityStore
   protected def geo: GeoStore
   protected def tag: TagStore
@@ -42,20 +43,20 @@ trait Store {
              start: Int = 0,
              num: Int = 100,
              provider: Option[String] = None,
-             timeperiod: Option[(Date, Date)] = None,
+             timeperiod: Option[(DateTime, DateTime)] = None,
              loc: Option[GeoLocation] = None,
              radius: Double = 50): List[(GUID, Double)] 
   = {
     import Helpers._
 
     val (startDate, endDate) = timeperiod match {
-      case Some((st, en)) if st.getTime >= millis &&
-      st.getTime > en.getTime => st -> en
-      case _ => (1.day.later.noTime) -> (1000.days.later.noTime)
+      case Some((st, en)) if st.getMillis >= millis &&
+      st.getMillis > en.getMillis => st -> en
+      case _ => (afgnow.plusDays(1)) -> (afgnow.plusDays(1000))
       }
 
-    val filter: GUID => Boolean = dateTime.test(startDate.getTime,
-                                                endDate.getTime) _
+    val filter: GUID => Boolean = dateTime.test(startDate.getMillis,
+                                                endDate.getMillis) _
 
     def geoFind(geoLocation: GeoLocation, start: Int, num: Int) = 
       geo.find(location = geoLocation, 

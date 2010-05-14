@@ -26,6 +26,9 @@ import org.joda.time.format._
 
 
 import org.snapimpact.util.SkipHandler
+import org.snapimpact.lib.AfgDate
+import org.snapimpact.lib.AfgDate._
+
 
 // Tests against the local server
 class APITest extends Runner(new APISpec) with JUnit with Console
@@ -130,17 +133,14 @@ def submitApiRequest( pars: (String, Any)*): Box[RetV1] =
     for {
       answer <- get( "/api/volopps", pars :_* ).filter(_.code == 200)
       val jString = new String(answer.body)
-      json <- tryo(parse(jString))
+      json <- tryo(JsonParser.parse(jString))
       ret <- tryo(json.extract[RetV1])
     } yield ret
   }
 
+def now = afgnow
 
-def dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd")
-
-def now = new DateTime
-
-def later(days: Int):String = dateFormatter.print(now.plusDays(days))
+def later(days: Int):String = AfgDate.dateFormatter.print(now.plusDays(days))
 
 def showRes(name: String)(res: Box[RetV1]) {
   res match {
@@ -218,12 +218,11 @@ def searchForHunger= {
   }
 }
 
-// Search by date - always assumes there are events bewteen now + 7 days and now + 14 days
+// Search by date - always assumes there are events between now + 7 days and now + 14 days
 def searchForSpecificDates = {
   val fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
-  val now = new DateTime
-  val plus7 = now.plusDays(7)
-  val plus14 = now.plusDays(14)
+  val plus7 = afgnow.plusDays(7)
+  val plus14 = afgnow.plusDays(14)
 
   val ret = submitApiRequest( "output" -> "json", "key" -> "UnitTest",
                              "vol_startdate" -> fmt.print(plus7), "vol_enddate" -> fmt.print(plus14)).open_!

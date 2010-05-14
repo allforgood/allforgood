@@ -169,6 +169,7 @@ private class MemoryDateTimeStore extends DateTimeStore {
 
   /**
    * Test if the GUID is in the date range
+   * TODO: rename to "contains" ?
    */
   def test(start: Long, end: Long)(guid: GUID):Boolean = {
     def testIt(it: DateTimeDuration): Boolean = {

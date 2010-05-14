@@ -8,10 +8,11 @@ package org.snapimpact.dispatch
  * To change this template use File | Settings | File Templates.
  */
 
-import org.snapimpact.etl.model.dto.VolunteerOpportunity
+import org.snapimpact.etl.model.dto._
 import org.joda.time.format.DateTimeFormat
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.ShortTypeHints
+import net.liftweb.util.Helpers._
 
 sealed class BoolOrString
 
@@ -19,6 +20,12 @@ final case class Bool(value: Boolean) extends BoolOrString
 final case class Str(value: String) extends BoolOrString
 
 object VolOppV1 {
+  def timeAsInt(t: Option[TimeOlson]): Int = t.map(_.time.roboSplit(":")) match {
+    case Some(AsInt(hrs) :: AsInt(mins) :: _) => hrs * 100 + mins
+    // TODO: default to noon if we can't figure it out
+    case _ => 1200
+  }
+
   def apply(in: VolunteerOpportunity): List[VolOppV1] = MapToV1(in)
 
 
@@ -215,10 +222,7 @@ object MapToV1 {
         case Some(yne) => yne.value
         case None => ""
       },
-      date.startTime match {
-        case Some(t) => t.time.toInt
-        case None => 0
-      },
+      VolOppV1.timeAsInt(date.startTime),
       "", // contactNoneNeeded
       in.categoryTags,
       in.contactInfo.contactEmail.getOrElse(""),
@@ -228,10 +232,8 @@ object MapToV1 {
       "", // url_short
       "", //addrname1
       0, //backfill_number
-      date.endTime match {
-        case Some(t) => t.time.toInt
-        case None => 0
-      })
+      VolOppV1.timeAsInt(date.endTime)
+      )
   }
 }
 

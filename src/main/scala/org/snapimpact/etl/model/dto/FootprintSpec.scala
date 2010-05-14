@@ -9,6 +9,9 @@ import net.liftweb.common._
 import model._
 import geocode._
 
+import org.snapimpact.lib.AfgDate
+import org.snapimpact.lib.AfgDate._
+
 /**
  * Created by IntelliJ IDEA.
  * User: mark
@@ -24,6 +27,12 @@ import geocode._
 object ParseHelper {
   class ParseHelperHelper(node: Node) {
     // The optional elements
+    def dateAsLong(name: String) : Option[Long] = {
+      for { 
+        nodeValue <- (node \ name).headOption
+        date <- AfgDate.parse(nodeValue.text)
+      } yield date.getMillis
+    }
     def %[T](name: String)(implicit cvt: Node => Option[T]): Option[T] = { 
       //FIXME This does the wrong thing with repeatable optional elements, but at least the failure is explicit
       val ns = (node \ name)
@@ -424,8 +433,8 @@ object DateTimeDuration {
   def fromXML(node: scala.xml.Node) =
     DateTimeDuration(
       node % "openEnded",
-      node % "startDate",
-      node % "endDate",
+      startDate = node dateAsLong "startDate",
+      endDate = node dateAsLong "endDate",
       node % "iCalRecurrence",
       node % "duration",
       node % "startTime",

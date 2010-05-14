@@ -10,22 +10,16 @@ import org.snapimpact.lib.Serializers.anyToRss
 import model._
 import geocode._
 
+import org.joda.time._
+import org.snapimpact.lib.AfgDate
+import org.snapimpact.lib.AfgDate._
+
 sealed trait OutputType
 final case object JsonOutputType extends OutputType
 final case object RssOutputType extends OutputType
 final case object HtmlOutputType extends OutputType
 
 object Api {
-  import java.util.Date
-
-  def asDate(in: String): Box[Date] = {
-    import java.text._
-
-    Helpers.tryo {
-      (new SimpleDateFormat("yyyy-MM-dd")).parse(in)
-    }
-  }
-
   def volopps(r: Req): LiftResponse = {
     try {
     for{
@@ -39,48 +33,29 @@ object Api {
         } yield geo
 
       val start = r.param("start").flatMap(Helpers.asInt).filter(_ > 0) openOr 1
-
       val num = r.param("num").flatMap(Helpers.asInt).filter(_ > 0) openOr 10
 
       val radius = r.param("vol_dist").flatMap(Helpers.asInt).filter(_ > 0).
       openOr(50)
 
-      val store = PersistenceFactory.store.vend
-
-      val startDate = r.param("vol_startdate").map(_.trim).flatMap(asDate)
-      val endDate = r.param("vol_enddate").map(_.trim).flatMap(asDate)
-
       val timeperiod = r.param("timeperiod").map(_.trim.toLowerCase)
-
-      import Helpers._
-
-      def isFriday(d: Date): Boolean = {
-        import java.util._
-        val utc = TimeZone.getTimeZone("UTC")
-        val cal = Calendar.getInstance(utc)
-        cal.setTimeInMillis(d.getTime)
-        cal.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY
-      }
-
-      def incTilFriday(d: Date): Date = {
-        if (isFriday(d)) d
-        else incTilFriday(1.day + d.getTime)
-      }
-
-      val timespan: (Date, Date) = (timeperiod, startDate, endDate) match {
-        case (Full("today"), _, _) => 0.days.later -> 1.day.later
-        case (Full("this_week"), _, _) => 0.days.later -> 7.days.later
+      val startDate = r.param("vol_startdate").map(_.trim).flatMap(AfgDate.parse)
+      val endDate = r.param("vol_enddate").map(_.trim).flatMap(AfgDate.parse)
+      val timespan: (DateTime, DateTime) = (timeperiod, startDate, endDate) match {
+        case (Full("today"), _, _) => afgnow -> afgnow.plusDays(1)
+        case (Full("this_week"), _, _) => afgnow -> afgnow.plusDays(7)
         case (Full("this_weekend"), _, _) => {
-          val friday = incTilFriday(0.days.later.noTime)
-          friday -> (3.days + friday.getTime)
+          val friday = incTilFriday(afgnow)
+          friday -> friday.plusDays(3)
         }
-
-        case (Full("this_month"), _, _) => 0.days.later -> 30.days.later
+        case (Full("this_month"), _, _) => afgnow -> afgnow.plusDays(30)
+        // TODO: detect unknown (but present) timeperiods and error
+        // case (Full(suppliedTimePeriod), _, _) => errorOut
         case (_, Full(s), Full(e)) => s -> e
-        case _ => 1.day.later.noTime -> 1000.days.later.noTime
+        case _ => afgnow.plusDays(1) -> afgnow.plusDays(1000)
       }
 
-
+      val store = PersistenceFactory.store.vend
       val res = store.read(store.search(query = r.param("q").map(_.trim).
                                         filter(_.length > 0),
                                         loc = loc,
