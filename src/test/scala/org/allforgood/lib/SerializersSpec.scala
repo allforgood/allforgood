@@ -3,7 +3,7 @@ package lib
 
 import org.specs.Specification
 import org.allforgood.lib.Serializers._
-import org.allforgood.etl.model.dto._
+import org.allforgood.model._
 
 import org.specs._
 import org.specs.runner._

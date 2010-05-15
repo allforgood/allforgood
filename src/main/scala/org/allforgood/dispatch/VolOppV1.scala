@@ -9,7 +9,7 @@ package dispatch
  * To change this template use File | Settings | File Templates.
  */
 
-import org.allforgood.etl.model.dto._
+import model._
 import org.joda.time.format.DateTimeFormat
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.ShortTypeHints

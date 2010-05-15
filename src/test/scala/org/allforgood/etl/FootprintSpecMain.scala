@@ -8,11 +8,12 @@ package etl
  * Time: 2:31:49 PM
  */
 
+import org.allforgood.model._
+
 import junit.framework._
 import Assert._
 
 import scala.xml.XML
-import model.dto._
 import net.liftweb.json.JsonAST
 import net.liftweb.json.JsonDSL._
 import net.liftweb.json.Extraction._
@@ -32,8 +33,6 @@ object FootprintSpecMain {
 }
 
 class FootprintSpecMain extends TestCase("app") {
-  implicit val formats = net.liftweb.json.DefaultFormats
-
   def testFootprintFeed() = {
     val subject = XML.loadFile(FootprintSpecMain.filename)
     val xmlFeed = FootprintFeed.fromXML(subject)

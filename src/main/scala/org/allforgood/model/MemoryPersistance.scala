@@ -1,8 +1,6 @@
 package org.allforgood
 package model
 
-import org.allforgood.etl.model.dto.{VolunteerOpportunity, DateTimeDuration}
-
 import net.liftweb._
 import util.Helpers
 import common._

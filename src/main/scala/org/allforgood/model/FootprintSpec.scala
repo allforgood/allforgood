@@ -1,7 +1,6 @@
 package org.allforgood
-package etl.model.dto
+package model
 
-import org.allforgood.etl.model.DataModel
 import org.joda.time.{DateTime => JTD}
 import xml.Node
 import net.liftweb.util.Helpers
@@ -101,7 +100,7 @@ case class FootprintFeed(
   // Spec lists VolunteerOpportunities as optional, why required here?
   opportunities: VolunteerOpportunities,
   // Reviews is optional
-  reviews: Option[Reviews]) extends DataModel
+  reviews: Option[Reviews])
 
 object FootprintFeed {
   def fromXML(node: scala.xml.Node) =
@@ -123,25 +122,22 @@ object FootprintFeed {
     }
 }
 
-case class Organizations(
-  orgs: List[Organization]) extends DataModel {
-}
+case class Organizations(orgs: List[Organization]) 
+
 
 object Organizations {
   def fromXML(node: scala.xml.Node) =
     Organizations((node \ "Organization").toList.map(Organization.fromXML(_)))
 }
 
-case class VolunteerOpportunities(opps: List[VolunteerOpportunity]) extends DataModel
+case class VolunteerOpportunities(opps: List[VolunteerOpportunity])
 
 object VolunteerOpportunities {
   def fromXML(orgMap: Map[String, Organization], node: scala.xml.Node) =
     VolunteerOpportunities((node \ "VolunteerOpportunity").toList.map(VolunteerOpportunity.fromXML(orgMap, _)))
 }
 
-case class Reviews(
-  reviews: List[Review]) extends DataModel {
-}
+case class Reviews(reviews: List[Review])
 
 object Reviews {
   def fromXML(node: scala.xml.Node) =
@@ -155,7 +151,7 @@ case class FeedInfo(
     createdDateTime: Long,
     providerURL: Option[String],
     termsOfUse:Option[String],
-    description:Option[String]) extends DataModel
+    description:Option[String])
 
 object FeedInfo {
   def fromXML(node: scala.xml.Node) =
@@ -183,8 +179,8 @@ case class Organization(
   donateURL:Option[String],
   logoURL:Option[String],
   detailURL:Option[String]
-  ) extends DataModel {
-}
+  ) 
+
 object Organization {
   def fromXML(node: scala.xml.Node) =
     Organization(
@@ -297,11 +293,11 @@ case class VolunteerOpportunity(
   description:Option[String],
   lastUpdated:Option[DateTimeOlsonDefaultPacific],
   expires:Option[DateTimeOlsonDefaultPacific]
-) extends DataModel
+) 
 
 case class ContactInfo(contactName:Option[String],
 		       contactPhone:Option[String],
-		       contactEmail:Option[String]) extends DataModel
+		       contactEmail:Option[String])
 
 object ContactInfo {
   def fromXML(node: Node) = new ContactInfo(
@@ -391,8 +387,8 @@ case class Review(
     reviewerID:Option[String],
     reviewerRole:Option[String],
     lastUpdated:Option[DateTimeOlsonDefaultPacific]
-  ) extends DataModel {
-}
+  ) 
+
 object Review {
   def fromXML(node: scala.xml.Node) =
     Review(
