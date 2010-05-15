@@ -1,7 +1,7 @@
 package helpers
 
 import _root_.java.util.{ArrayList, UUID}
-import org.snapimpact.etl.model.dto.FootprintFeed
+import org.allforgood.etl.model.dto.FootprintFeed
 import xml.XML
 
 /**

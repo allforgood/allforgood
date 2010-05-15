@@ -57,11 +57,6 @@
     </dependency>
     <dependency>
       <groupId>net.liftweb</groupId>
-      <artifactId>lift-wizard</artifactId>
-      <version>${lift.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.liftweb</groupId>
       <artifactId>lift-testkit</artifactId>
       <version>${lift.version}</version>
     </dependency>
@@ -79,19 +74,13 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.5</version>
+      <version>4.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.scala-tools.testing</groupId>
       <artifactId>specs_2.8.0.Beta1</artifactId>
-      <version>1.6.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.scalacheck</groupId>
-      <artifactId>scalacheck</artifactId>
-      <version>1.5</version>
+      <version>1.6.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -104,43 +93,6 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <version>1.6</version>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.4-701.jdbc4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>eclipselink</artifactId>
-      <version>2.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <!--
-    <dependency>
-      <groupId>org.scala-tools</groupId>
-      <artifactId>time</artifactId>
-      <version>2.7.0-0.1</version>
-    </dependency>
-    -->
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4.2</version>
     </dependency>
     <!-- for LiftConsole -->
     <dependency>

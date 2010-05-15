@@ -15,9 +15,9 @@ import net.liftweb.mapper.{DB,
 import java.sql.{Connection, DriverManager}
 import scala.xml.NodeSeq
 import org.joda.time._
-import org.snapimpact.model._
-import org.snapimpact.snippet._
-import org.snapimpact.lib.{MenuData, AfgDate}
+import org.allforgood.model._
+import org.allforgood.snippet._
+import org.allforgood.lib.{MenuData, AfgDate}
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -55,7 +55,7 @@ class Boot {
     LiftRules.snippetDispatch.append{case "Loc" => MenuData}
 
     // where to search snippet
-    LiftRules.addToPackages("org.snapimpact")
+    LiftRules.addToPackages("org.allforgood")
 
 
     LiftRules.setSiteMapFunc(MenuData.siteMap) // () => SiteMap(entries:_*))
@@ -76,14 +76,15 @@ class Boot {
 
     LiftRules.statelessDispatchTable.append {
       case r @ Req("api" :: "upload" :: Nil, _, _) =>
-        () => Full(org.snapimpact.dispatch.FeedUpload.upload(r))
+        () => Full(org.allforgood.dispatch.FeedUpload.upload(r))
       case r @ Req("api" :: "volopps" :: Nil, _, _) =>
-        () => Full(org.snapimpact.dispatch.Api.volopps(r))
+        () => Full(org.allforgood.dispatch.Api.volopps(r))
     }
 
+    /*
     LiftRules.snippetDispatch.append {
       case "DoYouLikeCats" => DoYouLikeCats
-    }
+    }*/
 
 
     S.addAround(DB.buildLoanWrapper)
