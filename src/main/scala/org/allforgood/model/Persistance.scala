@@ -1,8 +1,6 @@
 package org.allforgood
 package model
 
-import org.allforgood.etl.model.dto._
-
 import org.joda.time._
 import org.allforgood.lib.AfgDate._
 

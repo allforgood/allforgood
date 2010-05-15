@@ -2,7 +2,7 @@ package org.allforgood
 package dispatch
 
 import net.liftweb.common._
-import org.allforgood.etl.model.dto._
+import org.allforgood.model._
 import model._
 import net.liftweb._
 import http._

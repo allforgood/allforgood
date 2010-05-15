@@ -1,16 +1,11 @@
 package org.allforgood
 package model
 
-import org.specs.Specification
-import org.slf4j.LoggerFactory
-
 import org.specs._
 import org.specs.runner._
-import org.specs.Sugar._
 
 import net.liftweb.util._
-import org.allforgood.etl._
-import org.allforgood.etl.model.dto._
+import etl._
 
 class SearchStoreTest extends Runner(new SearchStoreSpec) with 
 JUnit with Console
