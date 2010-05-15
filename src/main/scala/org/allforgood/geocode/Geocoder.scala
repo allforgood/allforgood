@@ -74,8 +74,6 @@ object Geocoder {
       }
     }
 
-    if (in.toLowerCase == "ca") println("Hey... loc for CA is "+all)
-
     all
   }
 }

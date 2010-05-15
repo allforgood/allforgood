@@ -42,10 +42,8 @@ class EarthSpec extends Specification {
       val metersInMile = 1609.344
 
       // meters to miles
-      //System.out.println( "* Expected val=" + miles + ", was=" + Earth.metersToMiles( metersInMile ) )
       Earth.metersToMiles( metersInMile ) mustEqual miles
       // miles to meters
-      //System.out.println( "* Expected val=" + metersInMile + ", was=" + Earth.milesToMeters( miles ) )
       Earth.milesToMeters( miles ) mustEqual metersInMile
     }
   }
@@ -59,10 +57,8 @@ class EarthSpec extends Specification {
       val pnt2 = (40.0, -150.0)
 
       // distance in meters
-        //System.out.println( "* Expected val=" + distanceInMeters + ", was=" + Earth.distance( pnt1, pnt2 ) )
       Earth.distance( pnt1, pnt2 ) must beCloseTo( distanceInMeters, 0.00000009 );
       // distance in miles
-      //System.out.println( "* Expected val=" + distanceInMiles + ", was=" + Earth.distanceInMiles( pnt1, pnt2 ) )
       Earth.distanceInMiles( pnt1, pnt2 ) must beCloseTo( distanceInMiles, 0.00000009 );
 
     }

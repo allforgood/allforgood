@@ -95,11 +95,9 @@ object ReasonableCorpus {
     toTry.foreach {
       f =>
         tryo {
-          println("Loading "+f+" into store")
           val h = XML.loadFile(f)
           val hf = FootprintFeed.fromXML(h)
           hf.opportunities.opps.foreach{ a => st.add(a)}
-          println("Finished loading "+f)
         }
     }
 
