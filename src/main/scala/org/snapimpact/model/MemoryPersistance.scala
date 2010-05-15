@@ -26,7 +26,6 @@ private class MemoryOpportunityStore extends OpportunityStore {
     val guid = GUID(Helpers.nextFuncName)
 
     data += guid -> record
-
     guid
   }
 

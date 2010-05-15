@@ -49,14 +49,15 @@ trait Store {
   = {
     import Helpers._
 
-    val (startDate, endDate) = timeperiod match {
-      case Some((st, en)) if st.getMillis >= millis &&
-      st.getMillis > en.getMillis => st -> en
-      case _ => (afgnow.plusDays(1)) -> (afgnow.plusDays(1000))
+    // val (startDate, endDate) = 
+    val filter: GUID => Boolean = timeperiod match {
+      case Some((st, en)) if st.getMillis >= afgnow.getMillis &&
+      st.getMillis > en.getMillis =>
+        dateTime.test(st.getMillis, en.getMillis) _
+        
+      case _ => x => true // (afgnow.plusDays(1)) -> (afgnow.plusDays(1000))
       }
 
-    val filter: GUID => Boolean = dateTime.test(startDate.getMillis,
-                                                endDate.getMillis) _
 
     def geoFind(geoLocation: GeoLocation, start: Int, num: Int) = 
       geo.find(location = geoLocation, 
@@ -127,14 +128,14 @@ trait Store {
   }
 }
 
-private object DefaultStore extends Store {
+private object DefaultStore extends DefaultStore
 
+private class DefaultStore extends Store {
   protected lazy val store = PersistenceFactory.opportunityStore.vend
   protected lazy val geo = PersistenceFactory.geoStore.vend
   protected lazy val tag = PersistenceFactory.tagStore.vend
   protected lazy val search = PersistenceFactory.searchStore.vend
   protected lazy val dateTime = PersistenceFactory.dateTimeStore.vend
-
 }
 
 

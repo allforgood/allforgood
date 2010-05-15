@@ -12,13 +12,6 @@ import geocode._
 import org.snapimpact.lib.AfgDate
 import org.snapimpact.lib.AfgDate._
 
-/**
- * Created by IntelliJ IDEA.
- * User: mark
- * Date: Feb 20, 2010
- * Time: 4:10:27 PM
- */
-
 
 /**
  * This object contains a series of implicits that make

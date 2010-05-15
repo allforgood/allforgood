@@ -54,6 +54,55 @@ class SearchStoreSpec extends Specification {
 
       searchStore.find("quest", x => true).length must_== 1
     }
+
+    "Search data in a reasonable corpus" in {
+      ReasonableCorpus.corpus.search(query = Some("dodgeball")).length must be > 0
+    }
+  }
+}
+
+object ReasonableCorpus {
+  lazy val corpus = {
+    import scala.xml.XML
+    import java.io.{File => JFile}
+    import Helpers._
+    import net.liftweb.common._
+
+    import org.snapimpact.lib.AfgDate
+    import org.joda.time._
+
+    AfgDate.calcDateTimeFunc = Some(() => new DateTime("2008-12-28"))
+
+
+    class MyStore extends Store {
+      protected lazy val store = new MemoryOpportunityStore
+      protected lazy val geo = new MemoryGeoStore
+      protected lazy val tag = new MemoryTagStore 
+      protected lazy val search = new MemoryLuceneStore
+      protected lazy val dateTime = new MemoryDateTimeStore
+    }
+
+    var st = new MyStore
+
+    val toTry = new JFile("src/test/resources/HockeyData.xml") ::
+    new JFile("src/test/resources/sampleData0.1.r1254.xml")  :: (for {
+      dir <- tryo{new JFile("./docs/test_data")}.toList
+      files <- (Box !! dir.listFiles).toList
+      file <- files if file.getName.endsWith(".xml")
+    } yield file)
+
+    toTry.foreach {
+      f =>
+        tryo {
+          println("Loading "+f+" into store")
+          val h = XML.loadFile(f)
+          val hf = FootprintFeed.fromXML(h)
+          hf.opportunities.opps.foreach{ a => st.add(a)}
+          println("Finished loading "+f)
+        }
+    }
+
+    st
   }
 }
 
