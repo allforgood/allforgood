@@ -9,7 +9,6 @@
 package org.allforgood
 package etl
 
-import model.dto._
 import scala.xml.XML
 import org.specs.Specification
 import org.specs.runner._

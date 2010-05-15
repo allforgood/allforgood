@@ -19,7 +19,6 @@ import Loc._
 
 import scala.xml._
 
-import etl.model.dto._
 import model._
 
 
