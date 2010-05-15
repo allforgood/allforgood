@@ -1,5 +1,0 @@
-maintainer        "Opscode, Inc."
-maintainer_email  "cookbooks@opscode.com"
-license           "Apache 2.0"
-description       "LWRPs for managing AWS resources"
-version           "0.8"
