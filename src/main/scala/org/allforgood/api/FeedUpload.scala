@@ -1,5 +1,5 @@
 package org.allforgood
-package dispatch
+package api
 
 import net.liftweb.common._
 import org.allforgood.model._

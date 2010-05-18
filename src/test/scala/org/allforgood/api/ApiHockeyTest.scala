@@ -1,5 +1,5 @@
 package org.allforgood
-package dispatch
+package api
 
 /**
  * Created by IntelliJ IDEA.

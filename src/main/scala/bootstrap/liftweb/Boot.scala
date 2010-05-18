@@ -15,9 +15,12 @@ import net.liftweb.mapper.{DB,
 import java.sql.{Connection, DriverManager}
 import scala.xml.NodeSeq
 import org.joda.time._
-import org.allforgood.model._
-import org.allforgood.snippet._
-import org.allforgood.lib.{MenuData, AfgDate}
+import org.allforgood._
+import model._
+import snippet._
+import lib.{MenuData, AfgDate}
+import api._
+
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -76,9 +79,9 @@ class Boot {
 
     LiftRules.statelessDispatchTable.append {
       case r @ Req("api" :: "upload" :: Nil, _, _) =>
-        () => Full(org.allforgood.dispatch.FeedUpload.upload(r))
+        () => Full(FeedUpload.upload(r))
       case r @ Req("api" :: "volopps" :: Nil, _, _) =>
-        () => Full(org.allforgood.dispatch.Api.volopps(r))
+        () => Full(Api.volopps(r))
     }
 
     /*
