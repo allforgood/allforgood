@@ -47,7 +47,6 @@ trait Store {
   = {
     import Helpers._
 
-    // val (startDate, endDate) = 
     val filter: GUID => Boolean = timeperiod match {
       case Some((st, en)) if st.getMillis >= afgnow.getMillis &&
       st.getMillis > en.getMillis =>
@@ -105,7 +104,13 @@ trait Store {
               geoFind(geoLocation, 0, (start + num) * 10)).drop(start).take(num)
       }
 
-      case _ => Nil
+      case _ => {
+        val (startTime, endTime) = timeperiod.getOrElse(new DateTime, (new DateTime).plusDays(1000))
+     
+        dateTime.find(startTime.getMillis, endTime.getMillis).map {
+          case (guid, millis) => guid -> (if (millis == 0L) 1.0 else 1d/millis.toDouble)
+        }.sortWith(_._2 < _._2).drop(start).take(num)
+      }
     }
   }
                

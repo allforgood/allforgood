@@ -1,6 +1,8 @@
 package org.allforgood
 package model
 
+import lib.AfgDate
+
 import net.liftweb._
 import util.Helpers
 import common._
@@ -162,7 +164,22 @@ private class MemoryDateTimeStore extends DateTimeStore {
    * Find a series GUIDs that are in the time/date range.
    * Return the GUID and millis until start
    */
-  def find(start: Long, end: Long): List[(GUID, Long)] = Nil
+  def find(start: Long, end: Long): List[(GUID, Long)] = {
+    val ctm = AfgDate.afgnow.getMillis
+
+    def test(in: List[DateTimeDuration]): List[Long] = 
+      in.partialMap {
+        case DateTimeDuration(_, Some(startTime), Some(endTime), _, _, _, _, _, _) 
+        if startTime <= end && endTime >= start && startTime >= ctm
+        => startTime - ctm
+      }.sortWith(_ < _).take(1)
+
+    val m = synchronized(info)
+    (for {
+      (guid, durs) <- m.view
+      dur <- test(durs)
+    } yield guid -> (dur - start)).toList
+  }
 
   /**
    * Test if the GUID is in the date range

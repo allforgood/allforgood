@@ -1,156 +1,156 @@
-package org.allforgood
-package api
+  package org.allforgood
+  package api
 
-/**
- * Created by IntelliJ IDEA.
- * User: okristjansson
- * Date: Mar 16, 2010
- * Time: 8:38:30 PM
- * To change this template use File | Settings | File Templates.
- */
+  /**
+   * Created by IntelliJ IDEA.
+   * User: okristjansson
+   * Date: Mar 16, 2010
+   * Time: 8:38:30 PM
+   * To change this template use File | Settings | File Templates.
+   */
 
-import _root_.org.specs._
-import _root_.org.specs.runner._
-import _root_.org.specs.Sugar._
+  import _root_.org.specs._
+  import _root_.org.specs.runner._
+  import _root_.org.specs.Sugar._
 
-import net.liftweb.http.testing._
-import net.liftweb.common._
-import net.liftweb.util.Helpers._
-import net.liftweb.json._
-import JsonParser._
-import JsonAST._
-import specification.Expectable
-import _root_.org.specs.execute._
-import org.joda.time._
-import org.joda.time.format._
-
-
-import org.allforgood.util.SkipHandler
-import org.allforgood.lib.AfgDate
-import org.allforgood.lib.AfgDate._
+  import net.liftweb.http.testing._
+  import net.liftweb.common._
+  import net.liftweb.util.Helpers._
+  import net.liftweb.json._
+  import JsonParser._
+  import JsonAST._
+  import specification.Expectable
+  import _root_.org.specs.execute._
+  import org.joda.time._
+  import org.joda.time.format._
 
 
-// Tests against the local server
-class APITest extends Runner(new APISpec) with JUnit with Console
-
-class APISpec extends Specification with ApiSubmitTester with RequestKit
-{
-  def baseUrl = "http://localhost:8989"
-  RunWebApp.start()
-
-  "api" should {
-
-    "Give a 401 without a key" in {
-      get("/api/volopps", "q" -> "hunger").map(_.code) must_== Full(401)
-    }
-
-    "Give a 200 with a key" in {
-      get("/api/volopps", "key" -> "test", "q" -> "hunger").
-      map(_.code)  must_== Full(200)
-    }
+  import org.allforgood.util.SkipHandler
+  import org.allforgood.lib.AfgDate
+  import org.allforgood.lib.AfgDate._
 
 
+  // Tests against the local server
+  class APITest extends Runner(new APISpec) with JUnit with Console
+
+  class APISpec extends Specification with ApiSubmitTester with RequestKit
+  {
+    def baseUrl = "http://localhost:8989"
+    RunWebApp.start()
+
+    "api" should {
+
+      "Give a 401 without a key" in {
+        get("/api/volopps", "q" -> "hunger").map(_.code) must_== Full(401)
+      }
+
+      "Give a 200 with a key" in {
+        get("/api/volopps", "key" -> "test", "q" -> "hunger").
+        map(_.code)  must_== Full(200)
+      }
 
 
-    // once these pass that means somebody is making progress on the API development
-    // and the pendingUntilFixed wrapper can be excluded
-    "provide common functionalities" in
+
+
+      // once these pass that means somebody is making progress on the API development
+      // and the pendingUntilFixed wrapper can be excluded
+      "provide common functionalities" in
+      {
+        sharedFunctionality
+      }
+
+      // Searches
+      "search for something not there" in {
+        searchFor_zx_NotThere_xz
+      }
+      "search for hunger" in {
+        searchForHunger
+      }
+      "search for specific dates" in {
+        searchForSpecificDates
+      }
+
+      "search for zip code" in {
+        searchForZip
+      }
+
+      "search for date then zip code" in {
+        searchForDateThenZip
+      }
+
+    }  //  "api" should
+  }   // ApiSpec
+
+
+
+
+
+  // These tests are going against the current AllForGood live webserver
+  // http://www.allforgood.org and should succeed at all times
+
+  class V1SysTest extends Runner(new V1SysSpec) with JUnit with Console
+
+  class V1SysSpec extends Specification with RequestKit with ApiSubmitTester
+  {
+    def baseUrl = "http://www.allforgood.org"
+
+    "The API from the old V1 system" should
     {
-      sharedFunctionality
+      "extracts common" in {sharedFunctionality}
     }
 
-    // Searches
-    "search for something not there" in {
-      searchFor_zx_NotThere_xz
-    }
-    "search for hunger" in {
-      searchForHunger
-    }
-    "search for specific dates" in {
-      searchForSpecificDates
-    }
-
-    "search for zip code" in {
-      searchForZip
-    }
-
-    "search for date then zip code" in {
-      searchForDateThenZip
-    }
-
-  }  //  "api" should
-}   // ApiSpec
-
-
-
-
-
-// These tests are going against the current AllForGood live webserver
-// http://www.allforgood.org and should succeed at all times
-
-class V1SysTest extends Runner(new V1SysSpec) with JUnit with Console
-
-class V1SysSpec extends Specification with RequestKit with ApiSubmitTester
-{
-  def baseUrl = "http://www.allforgood.org"
-
-  "The API from the old V1 system" should
-  {
-    "extracts common" in {sharedFunctionality}
-  }
-
-  // This times out the server, let's skip it
-  //  "search for something not there" in {zx_NotThere_xz }
-  
-
-  "The API from the old V1 system" should
-  {
-    "search for hunger" in {searchForHunger}
+    // This times out the server, let's skip it
+    //  "search for something not there" in {zx_NotThere_xz }
     
-    "search for specific dates" in {searchForSpecificDates}
 
-    "search for zip code" in {searchForZip}
+    "The API from the old V1 system" should
+    {
+      "search for hunger" in {searchForHunger}
+      
+      "search for specific dates" in {searchForSpecificDates}
 
-    "search for date then zip code" in {searchForDateThenZip}
-  }
-}  // V1SysSpec
+      "search for zip code" in {searchForZip}
 
-
-
-
-
-// Does the actual interaction with the webserver and includes the common tests
-trait ApiSubmitTester // extends  // with TestKit
-{
-  self: Specification with RequestKit =>
-
-    implicit def formats = DefaultFormats
-
-
-// Returns RetV1 object from volopps API search
-def submitApiRequest( pars: (String, Any)*): Box[RetV1] =
-  {
-    for {
-      answer <- get( "/api/volopps", pars :_* ).filter(_.code == 200)
-      val jString = new String(answer.body)
-      json <- tryo(JsonParser.parse(jString))
-      ret <- tryo(json.extract[RetV1])
-    } yield ret
-  }
-
-def now = afgnow
-
-def later(days: Int):String = AfgDate.dateFormatter.print(now.plusDays(days))
-
-def showRes(name: String)(res: Box[RetV1]) {
-  res match {
-    case Full(v1) => {
-      println(name+": "+v1)
+      "search for date then zip code" in {searchForDateThenZip}
     }
+  }  // V1SysSpec
 
-    case x => println(name+": "+x)
-  }
-}
+
+
+
+
+  // Does the actual interaction with the webserver and includes the common tests
+  trait ApiSubmitTester {
+    self: Specification with RequestKit =>
+      
+      implicit def formats = DefaultFormats
+    
+    
+    // Returns RetV1 object from volopps API search
+    def submitApiRequest( pars: (String, Any)*): Box[RetV1] =
+      {
+        for {
+          answer <- get( "/api/volopps", pars :_* ).filter(_.code == 200)
+          val jString = new String(answer.body)
+          json <- tryo(JsonParser.parse(jString))
+          ret <- tryo(json.extract[RetV1])
+        } yield ret
+      }
+    
+    def now = afgnow
+    
+    def later(days: Int):String = AfgDate.dateFormatter.print((new DateTime("2010-05-08").plusDays(days)))
+    
+    def showRes(name: String)(res: Box[RetV1]) {
+      res match {
+        case Full(v1) => {
+          println(name+": "+v1)
+        }
+        
+        case x => println(name+": "+x)
+      }
+    }
+                                                            
 
 def testParams(f: Box[Box[RetV1] => Unit], p: (String, Any)*)(countTest: Int => Unit) {
   val res = submitApiRequest("output" -> "json" :: 

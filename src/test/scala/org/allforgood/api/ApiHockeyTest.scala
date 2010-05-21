@@ -118,50 +118,41 @@ class ApiHockeyDataSpec extends Specification with ApiSubmitTester with RequestK
     }
 
     "return exact count of events for date 5/13/2010 12:00:00 AM" in { 
-      SkipHandler {
-        testParams("vol_startdate" -> later(5),
-                   "vol_enddate" -> later(6)) {
-                     _ must be >= 53
-                   }
-      }
+      testParams("vol_startdate" -> later(5),
+                 "vol_enddate" -> later(6)) {
+                   i =>
+                   i must be >= 48
+                 }
     }
 
     "return exact count of events for date 5/18/2010 12:00:00 AM" in { 
-      SkipHandler {
-        testParams("vol_startdate" -> later(10),
-                   "vol_enddate" -> later(11)) {
-                     _ must be >= 52
-                   }
-      }
+      testParams("vol_startdate" -> later(10),
+                 "vol_enddate" -> later(11)) {
+                   _ must be >= 48
+                 }
     }
 
     "return exact count of events for date 5/23/2010 12:00:00 AM" in { 
-      SkipHandler {
         testParams("vol_startdate" -> later(15),
                    "vol_enddate" -> later(16))
         {
-          _ must be >= 58
+          _ must be >= 48
         }
-      }
     }
 
     "return exact count of events for date 5/28/2010 12:00:00 AM" in {
-      SkipHandler {
-        testParams("vol_startdate" -> later(20),
-                   "vol_enddate" -> later(21)) {
-                     _ must be >= 45
-                   }
-      }
+      testParams("vol_startdate" -> later(20),
+                 "vol_enddate" -> later(21)) {
+                   _ must be >= 45
+                 }
     }
  
 
     "return exact count of events for date 6/2/2010 12:00:00 AM" in { 
-      SkipHandler {
-        testParams("vol_startdate" -> later(25),
-                   "vol_enddate" -> later(26)) {
-                     _ must be >= 42
-                   }
-      }
+      testParams("vol_startdate" -> later(25),
+                 "vol_enddate" -> later(26)) {
+                   _ must be >= 42
+                 }
     }
 
     "return exact count of events for game #249" in {
