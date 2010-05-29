@@ -17,7 +17,7 @@ class AllForGoodProject(info: ProjectInfo) extends DefaultWebProject(info) {
     "org.mortbay.jetty" % "jetty" % "6.1.22" % "test",
     "com.h2database" % "h2" % "1.2.134",
     "junit" % "junit" % "4.7" % "test",
-    "org.scala-tools.testing" % "specs_2.8.0.Beta1" % "1.6.4" % "test",
+    "org.scala-tools.testing" % "specs_2.8.0.RC3" % "1.6.5-SNAPSHOT" % "test",
 
     "joda-time" % "joda-time" % "1.6"
   ) ++ super.libraryDependencies

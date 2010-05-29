@@ -168,7 +168,7 @@ private class MemoryDateTimeStore extends DateTimeStore {
     val ctm = AfgDate.afgnow.getMillis
 
     def test(in: List[DateTimeDuration]): List[Long] = 
-      in.partialMap {
+      in.collect {
         case DateTimeDuration(_, Some(startTime), Some(endTime), _, _, _, _, _, _) 
         if startTime <= end && endTime >= start && startTime >= ctm
         => startTime - ctm

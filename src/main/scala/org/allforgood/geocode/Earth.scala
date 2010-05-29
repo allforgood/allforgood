@@ -1,6 +1,8 @@
 package org.allforgood
 package geocode
 
+import java.lang.Math
+
 /**
  * Created by IntelliJ IDEA.
  * User: vpatryshev

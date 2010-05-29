@@ -103,8 +103,9 @@ case class FootprintFeed(
   reviews: Option[Reviews])
 
 object FootprintFeed {
-  def fromXML(node: scala.xml.Node) =
-    if (node \ "@schemaVersion" != "0.1")
+  def fromXML(node: scala.xml.Node) ={
+
+    if ((node \ "@schemaVersion").text != "0.1")
       throw new RuntimeException("""missing required attribute schemaVersion="0.1" in FootprintFeed""")
     else {
       val orgs: Option[Organizations] = node % "Organizations"
@@ -120,6 +121,7 @@ object FootprintFeed {
         node %% "VolunteerOpportunities",
         node % "Reviews")
     }
+  }
 }
 
 case class Organizations(orgs: List[Organization]) 
@@ -329,7 +331,7 @@ object VolunteerOpportunity {
 
   implicit def voToTags(in: VolunteerOpportunity): List[Tag] =
     (in.audienceTags.map(Tag.apply) :::
-     in.categoryTags.map(Tag.apply)).removeDuplicates
+     in.categoryTags.map(Tag.apply)).distinct
 
   implicit def voToDateTime(in: VolunteerOpportunity): List[DateTimeDuration] = 
     in.dateTimeDurations

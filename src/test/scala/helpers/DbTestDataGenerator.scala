@@ -4,6 +4,9 @@ import _root_.java.util.{ArrayList, UUID}
 import org.allforgood.model.FootprintFeed
 import xml.XML
 
+import net.liftweb._
+import util.Helpers._
+
 /**
  * Created by IntelliJ IDEA.
  * User: zkim
@@ -14,7 +17,7 @@ import xml.XML
 
 object DbTestDataGenerator {
     def rndStr = UUID.randomUUID.toString
-    def rndLong = (Math.random * 1000).asInstanceOf[Long]
+    def rndLong = randomLong(1000)
 
     def genFootprintFeed = {
       val subject = XML.loadFile("src/test/resources/sampleData0.1.r1254.xml")

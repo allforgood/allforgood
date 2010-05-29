@@ -8,6 +8,7 @@ import net.liftweb.util._
 import net.liftweb.common._
 import net.liftweb.http._
 import geocode.Earth
+import java.lang.Math
 
 object PersistenceFactory extends Factory {
   val opportunityStore = new FactoryMaker[OpportunityStore](() => MemoryOpportunityStore) {}
