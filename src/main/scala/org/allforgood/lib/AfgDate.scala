@@ -14,8 +14,13 @@ object AfgDate {
   def afgnow: DateTime = calcDateTimeFunc.map(_()) getOrElse new DateTime
   def setCalcDate(d: DateTime) { calcDateTimeFunc = Some(() => d) }
   def format(d: DateTime): String = dateFormatter.print(d)
-  def parse(s: String): Box[DateTime] = tryo {
-    dateFormatter.parseDateTime( s )
+  def parse(s: String): Box[DateTime] = s match {
+    case null => Empty
+    case s if s.length >= 10 =>
+      tryo {
+        dateFormatter.parseDateTime( s.substring(0, 10) )
+      }
+    case _ => Empty
   }
   def isFriday(d: DateTime): Boolean = {
     d.getDayOfWeek == DateTimeConstants.FRIDAY

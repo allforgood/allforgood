@@ -1,0 +1,134 @@
+<?xml version="1.0" ?>
+<FootprintFeed schemaVersion="0.1">
+  <FeedInfo>
+    <providerID>2</providerID>
+    <providerName>SuperTD</providerName>
+    <createdDateTime olsonTZ="America/Denver">2008-12-30T14:30:10.5</createdDateTime>
+    <providerURL>http://www.mytestdata.org</providerURL>
+  </FeedInfo>
+  <VolunteerOpportunities>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+
+
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+    <VolunteerOpportunity>
+      <volunteerOpportunityID>35</volunteerOpportunityID>
+      <sponsoringOrganizationIDs><sponsoringOrganizationID>2820</sponsoringOrganizationID></sponsoringOrganizationIDs>
+      <title>Sharing the Harvest</title>
+      <dateTimeDurations><dateTimeDuration><openEnded>No</openEnded><startDate>2009-06-28</startDate><startTime>10:00:00</startTime><endDate>2009-10-31</endDate><endTime>11:00:00</endTime></dateTimeDuration></dateTimeDurations>
+      <locations><location><streetAddress1>276 Gulf Road</streetAddress1><city>Dartmouth</city><region>MA</region><postalCode>02748</postalCode></location></locations>
+      <categoryTags><categoryTag>Other Projects</categoryTag></categoryTags>
+      <description>Sharing the Harvest is a volunteer-based hunger relief effort run at the Dartmouth YMCA. Community Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</description>
+      <abstract>Sharing the Harvest is Community a volunteer-based hunger relief effort run at the Dartmouth YMCA. Working from a two-acre farm at the Dartmouth YMCA, volunteers help to raise, cultivate and harvest fresh produce for local donation. Our partners, The Hunger Commission of the United Way of Greater New Bedford, distribute the food for us. In it's fourth year, Sharing the Harvest has donated more than 27,000 pounds of produce and with your help can donate much more. - Other Projects</abstract>
+      <detailURL>http://www.ymca.net/volunteering/?opp=35</detailURL>
+      <skills>Eagerness to Learn and willingness to work hard.</skills>
+    </VolunteerOpportunity>
+  </VolunteerOpportunities>
+</FootprintFeed>

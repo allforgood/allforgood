@@ -50,8 +50,8 @@ trait Store {
 
     val filter: GUID => Boolean = timeperiod match {
       case Some((st, en)) if st.getMillis >= afgnow.getMillis &&
-      st.getMillis > en.getMillis =>
-        dateTime.test(st.getMillis, en.getMillis) _
+      st.getMillis < en.getMillis =>
+            dateTime.test(st.getMillis, en.getMillis) _
         
       case _ => x => true // (afgnow.plusDays(1)) -> (afgnow.plusDays(1000))
       }
@@ -106,7 +106,9 @@ trait Store {
       }
 
       case _ => {
-        val (startTime, endTime) = timeperiod.getOrElse(new DateTime, (new DateTime).plusDays(1000))
+        val (startTime, endTime) = timeperiod.getOrElse(afgnow, afgnow.plusDays(1000))
+
+        println("Finding for "+startTime+" to "+endTime)
      
         dateTime.find(startTime.getMillis, endTime.getMillis).map {
           case (guid, millis) => guid -> (if (millis == 0L) 1.0 else 1d/millis.toDouble)

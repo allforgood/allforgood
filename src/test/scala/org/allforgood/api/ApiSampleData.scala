@@ -40,9 +40,9 @@ class ApiSampleDataSpec extends Specification with ApiSubmitTester with RequestK
     
     // Upload the sample file, that holds the test data
     "Accept valid xml upload" in {
-      post("/api/upload?key=somekey", XML.loadFile("src/test/resources/sampleData0.1.r1254.xml")).map(_.code) must_== Full(200)
+      post("/api/upload?key=somekey", 
+           XML.loadFile("src/test/resources/sampleData0.1.r1254.xml")).map(_.code) must_== Full(200)
     }
-    
     
     "not return events for something that is not available in the data " in
     {
@@ -102,7 +102,7 @@ class ApiSampleDataSpec extends Specification with ApiSubmitTester with RequestK
       }
     }
 
-    "return events from Hunger category" in
+    "return events from Hunger keyword" in
     {
       testParams("q" -> "Hunger" ) {
         _ must be >= 1
@@ -118,7 +118,7 @@ class ApiSampleDataSpec extends Specification with ApiSubmitTester with RequestK
 
     // hunger cats
     "return events for hunger category" in {
-      testParams("q" -> "category:Hunger" ) {
+      testParams("q" -> "category: Hunger" ) {
         _ must be > 0
       }
     }

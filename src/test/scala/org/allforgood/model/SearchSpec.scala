@@ -81,12 +81,14 @@ object ReasonableCorpus {
     var st = new MyStore
 
     val toTry = new JFile("src/test/resources/HockeyData.xml") ::
-    new JFile("src/test/resources/sampleData0.1.r1254.xml")  :: (for {
-      dir <- tryo{new JFile("./docs/test_data")}.toList
-      files <- (Box !! dir.listFiles).toList
-      file <- files if file.getName.endsWith(".xml")
-    } yield file)
-
+    new JFile("src/test/resources/sampleData0.1.r1254.xml")  :: 
+      (for {
+        dirName <- List("./docs/test_data", "./docs/base_data")
+        dir <- tryo{new JFile(dirName)}.toList
+        files <- (Box !! dir.listFiles).toList
+        file <- files if file.getName.endsWith(".xml")
+      } yield file)
+      
     toTry.foreach {
       f =>
         tryo {

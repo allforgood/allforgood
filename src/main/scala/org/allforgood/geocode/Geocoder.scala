@@ -84,7 +84,8 @@ class Geocoder extends RequestKit {
   protected def getString(url: String, params: (String, Any)*): Box[String] =
     for {
       resp <- get(url, params :_*).filter(_.code == 200) ?~ "Didn't get a 200"
-      answer <- tryo(new String(resp.body, "UTF-8"))
+      body <- resp.body
+      answer <- tryo(new String(body, "UTF-8"))
     } yield answer
 
   private def getGeoLocation(in: String): Box[GeoLocation] = {

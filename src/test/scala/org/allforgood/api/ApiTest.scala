@@ -131,7 +131,8 @@
       {
         for {
           answer <- get( "/api/volopps", pars :_* ).filter(_.code == 200)
-          val jString = new String(answer.body)
+          body <- answer.body
+          val jString = new String(body, "UTF-8")
           json <- tryo(JsonParser.parse(jString))
           ret <- tryo(json.extract[RetV1])
         } yield ret
@@ -322,7 +323,8 @@ object RunWebApp {
         import java.io.{File => JFile}
         server.start()
         for {
-          dir <- tryo{new JFile("./docs/test_data")}
+          dirName <- List("./docs/test_data", "./docs/base_data")
+          dir <- tryo{new JFile(dirName)}
           files <- Box !! dir.listFiles
         } Uploader.upload(files.toList)
         uploaded = true
@@ -344,7 +346,7 @@ object Uploader extends RequestKit {
 
   def upload(in: List[JFile]) {
     for {
-      file <- in.take(1)
+      file <- in if file.getName().endsWith(".xml")
       bytes <- tryo{readWholeFile(file)}
       xml <- tryo{XML.load(new ByteArrayInputStream(bytes))}
     } {

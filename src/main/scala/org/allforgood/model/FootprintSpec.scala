@@ -421,8 +421,8 @@ case class DateTimeDuration(
 }
 
 object DateTimeDuration {
-  def fromXML(node: scala.xml.Node) =
-    DateTimeDuration(
+  def fromXML(node: scala.xml.Node) = {
+    val ret = DateTimeDuration(
       node % "openEnded",
       startDate = node dateAsLong "startDate",
       endDate = node dateAsLong "endDate",
@@ -433,6 +433,8 @@ object DateTimeDuration {
       node % "timeFlexible",
       node % "commitmentHoursPerWeek"
     )
+    ret
+  }
 }
 
 /**
