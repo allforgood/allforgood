@@ -108,8 +108,6 @@ trait Store {
       case _ => {
         val (startTime, endTime) = timeperiod.getOrElse(afgnow, afgnow.plusDays(1000))
 
-        println("Finding for "+startTime+" to "+endTime)
-     
         dateTime.find(startTime.getMillis, endTime.getMillis).map {
           case (guid, millis) => guid -> (if (millis == 0L) 1.0 else 1d/millis.toDouble)
         }.sortWith(_._2 < _._2).drop(start).take(num)

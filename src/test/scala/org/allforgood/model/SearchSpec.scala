@@ -37,7 +37,7 @@ class SearchStoreSpec extends Specification {
       searchStore.add(guid2, "Moose are my favorite fruit")
       
       searchStore.find("eat", x => true).take(1).map(_._1) must_== List(guid1)
-      searchStore.find("fruit", x => true).length must_== 2
+      searchStore.find("fruit", x => true).length must be >= 2
     }
 
 
