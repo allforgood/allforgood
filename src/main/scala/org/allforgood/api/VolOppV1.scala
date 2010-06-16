@@ -11,6 +11,7 @@ package api
 
 import model._
 import org.joda.time.format.DateTimeFormat
+import scala.xml.Elem
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.ShortTypeHints
 import net.liftweb.util.Helpers._
@@ -161,7 +162,18 @@ class VolOppV1(
         val url_short: String,
         val addrname1: String,
         val backfill_number: Int,
-        val endTime: Int)
+        val endTime: Int) {
+          def toXML: Elem = 
+            <item><title>{title}</title><link>{xml_url}</link><description>{description}</description><pubDate>{pubDate}</pubDate><guid>{xml_url}</guid>
+            <fp:id>{id}</fp:id><fp:backfill_number>{backfill_number}</fp:backfill_number><fp:backfill_title>{backfill_title}</fp:backfill_title><fp:groupid>Me21e9cc2a43aa10bdcf0eb1352035a29</fp:groupid><fp:provider>{provider}</fp:provider>
+            <fp:startDate>{startDate}</fp:startDate><fp:endDate>{endDate}</fp:endDate><fp:base_url>base_url</fp:base_url><fp:xml_url>{xml_url}</fp:xml_url><fp:url_short>{url_short}</fp:url_short><fp:latlong>{latlong}</fp:latlong>
+            <fp:location_name>{location_name}</fp:location_name><fp:interest_count>{interest_count}</fp:interest_count><fp:impressions>0</fp:impressions><fp:quality_score>{quality_score}</fp:quality_score>
+            <fp:categories>{categories.mkString(",")}</fp:categories><fp:skills>{skills}</fp:skills><fp:virtual>{virtual}</fp:virtual><fp:addr1>{addr1}</fp:addr1><fp:addrname1>{addrname1}</fp:addrname1>
+            <fp:sponsoringOrganizationName>{sponsoringOrganizationName}</fp:sponsoringOrganizationName><fp:openEnded>{openEnded}</fp:openEnded><fp:startTime>{startTime}</fp:startTime><fp:endTime>endTime</fp:endTime>
+            <fp:contactNoneNeeded>{contactNoneNeeded}</fp:contactNoneNeeded><fp:contactEmail>{contactEmail}</fp:contactEmail><fp:contactPhone>{contactPhone}</fp:contactPhone><fp:contactName>{contactName}</fp:contactName>
+            <fp:detailUrl>{detailUrl}</fp:detailUrl><fp:audienceAll>{audienceAll}</fp:audienceAll><fp:audienceAge>{audienceAge}</fp:audienceAge><fp:minAge>{minAge}</fp:minAge><fp:audienceSexRestricted>{audienceSexRestricted}</fp:audienceSexRestricted>
+            <fp:street1>{street1}</fp:street1><fp:street2>{street2}</fp:street2><fp:city>{city}</fp:city><fp:region>{region}</fp:region><fp:postalCode>{postalCode}</fp:postalCode><fp:country>{country}</fp:country></item>
+        }
 
 case class RetV1(
         lastBuildDate: String,

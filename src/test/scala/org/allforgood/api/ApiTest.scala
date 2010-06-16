@@ -13,6 +13,7 @@
   import _root_.org.specs.runner._
   import _root_.org.specs.Sugar._
 
+  import scala.xml.NodeSeq
   import net.liftweb.http.testing._
   import net.liftweb.common._
   import net.liftweb.util.Helpers._
@@ -125,18 +126,83 @@
       
       implicit def formats = DefaultFormats
     
-    
+    def viaJson(bytes: Array[Byte]): Box[RetV1] =
+      for {
+        jString <- tryo(new String(bytes, "UTF-8"))
+        json <- tryo(JsonParser.parse(jString))
+        ret <- tryo(json.extract[RetV1])
+      } yield ret
+      
+
+    def viaRss(bytes: Array[Byte]): Box[RetV1] =
+      for {
+        jString       <- tryo(new String(bytes, "UTF-8"))
+        xml           <- tryo(scala.xml.XML.loadString(jString))
+        rss           <- xml \ "rss"
+        channel       <- rss \ "channel"
+        lastBuildDate <- rss \ "lastBuildDate"
+        version       <- channel \ "version"
+        language      <- channel \ "language"
+        href          <- channel \ "atom:link"	// need to get href attribute, not value. how about rel and type attributes?
+        description   <- channel \ "description"
+        items         <- channel \ "item"
+        ret <- tryo(RetV1( lastBuildDate.toString, version.toString.toDouble, language.toString, href.toString, description.toString, items))
+     /*   volopps       <- VolOppV1(
+      Some(startDate),
+      Some(minAge),
+      Some(endDate),
+      contactPhone,
+      quality_score,
+      detailUrl,
+      sponsoringOrganizationName,
+      latlong,
+      contactName,
+      addr1,
+      impressions,
+      id,
+      city,
+      location_name,
+      openEnded,
+      pubDate,
+      title,
+      base_url,
+      virtual,
+      backfill_title,
+      provider,
+      postalCode,
+      groupid,
+      audienceAge,
+      audienceAll,
+      description,
+      street1,
+      street2,
+      interest_count,
+      xml_url,
+      audienceSexRestricted,
+      startTime,
+      contactNoneNeeded,
+      categories,
+      contactEmail,
+      skills,
+      country,
+      region,
+      url_short,
+      addrname1,
+      backfill_number,
+      endTime)  */
+     
+      } yield {
+        println();
+        ret
+        }
+
     // Returns RetV1 object from volopps API search
-    def submitApiRequest( pars: (String, Any)*): Box[RetV1] =
-      {
-        for {
-          answer <- get( "/api/volopps", pars :_* ).filter(_.code == 200)
-          body <- answer.body
-          val jString = new String(body, "UTF-8")
-          json <- tryo(JsonParser.parse(jString))
-          ret <- tryo(json.extract[RetV1])
-        } yield ret
-      }
+    def submitApiRequest(convert: Array[Byte] => Box[RetV1], pars: (String, Any)*): Box[RetV1] =
+      for {
+        answer <- get( "/api/volopps", pars :_* ).filter(_.code == 200)
+        body <- answer.body
+        ret <- convert(body)
+      } yield ret
     
     def now = afgnow
     
@@ -154,11 +220,24 @@
                                                             
 
 def testParams(f: Box[Box[RetV1] => Unit], p: (String, Any)*)(countTest: Int => Unit) {
-  val res = submitApiRequest("output" -> "json" :: 
+  val res = submitApiRequest(viaJson _, "output" -> "json" :: 
                              "key" -> "UnitTest" :: p.toList :_*)
   f.foreach(_.apply(res))
 
   res match {
+    case Full(ret) => {
+      countTest(ret.items.length)
+      for( item <- ret.items ) item must notBe( null )
+    }
+
+    case x => fail(x.toString)
+  }      
+  
+  val resRSS = submitApiRequest(viaRss _,"output" -> "rss" :: 
+                             "key" -> "UnitTest" :: p.toList :_*)
+  f.foreach(_.apply(resRSS))
+
+  resRSS match {
     case Full(ret) => {
       countTest(ret.items.length)
       for( item <- ret.items ) item must notBe( null )
@@ -176,7 +255,7 @@ def testParams(p: (String, Any)*)(countTest: Int => Unit) {
 // Test for root and props set
 def sharedFunctionality = {
 
-  val ret = submitApiRequest( "output" -> "json", "key" -> "UnitTest", "q" -> "a" ).open_!
+  val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest", "q" -> "a" ).open_!
 
   // Root of correct type
   ret must haveClass[RetV1]
@@ -199,7 +278,7 @@ def sharedFunctionality = {
 
 // Search for something not available in the database
 def searchFor_zx_NotThere_xz = {
-  val ret = submitApiRequest( "output" -> "json", "key" -> "UnitTest", "q" -> "zx_NotThere_xz" ).open_!
+  val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest", "q" -> "zx_NotThere_xz" ).open_!
   
   val count = 0
   
@@ -208,7 +287,7 @@ def searchFor_zx_NotThere_xz = {
 
 // *** Note *** This test assumes that there are always hunger events available in the database
 def searchForHunger= {
-  val ret = submitApiRequest( "output" -> "json", "key" -> "UnitTest", "q" -> "hunger" ).open_!
+  val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest", "q" -> "hunger" ).open_!
 
   val count = 0
   ret.items.length must be > count
@@ -225,7 +304,7 @@ def searchForSpecificDates = {
   val plus7 = afgnow.plusDays(7)
   val plus14 = afgnow.plusDays(14)
 
-  val ret = submitApiRequest( "output" -> "json", "key" -> "UnitTest",
+  val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest",
                              "vol_startdate" -> fmt.print(plus7), "vol_enddate" -> fmt.print(plus14)).open_!
 
   val count = 0
@@ -239,7 +318,7 @@ def searchForSpecificDates = {
 
 // Search by zip code - always assumes there are events in 94117 (San Francisco)
 def searchForZip = {
-  val ret = submitApiRequest( "output" -> "json", "key" -> "UnitTest", "vol_loc" -> "94117" ).open_!
+  val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest", "vol_loc" -> "94117" ).open_!
 
   val count = 0
   ret.items.length must be > count
@@ -258,7 +337,7 @@ def searchForDateThenZip = {
   val plus7 = now.plusDays(7)
   val plus14 = now.plusDays(14)
 
-  val ret = submitApiRequest( "output" -> "json", "key" -> "UnitTest",
+  val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest",
                              "vol_startdate" -> fmt.print(plus7), 
                              "vol_enddate" -> fmt.print(plus14),
                              "vol_loc" -> "94117").open_!

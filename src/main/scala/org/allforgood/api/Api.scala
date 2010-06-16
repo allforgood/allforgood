@@ -1,6 +1,7 @@
 package org.allforgood
 package api
 
+import scala.xml.Elem
 import scala.xml.NodeSeq
 import net.liftweb.http._
 import net.liftweb.common._
@@ -75,7 +76,12 @@ object Api {
                                                     "All for Good search results",
                                                     res.flatMap(a => MapToV1(a._2)).toList)))
 
-          case Full("rss") => XmlResponse(sampleRss, "application/rss+xml")
+          case Full("rss") =>
+            val v1s: List[VolOppV1] = res.flatMap(a => MapToV1(a._2))
+            val itemsXML: List[Elem] = v1s.map(a => a.toXML)
+            XmlResponse(<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:fp="http://www.allforgood.org/" xmlns:georss="http://www.georss.org/georss" xmlns:gml="http://www.opengis.net/gml"><channel><title>All for Good search results</title><link>http://www.allforgood.org/</link><atom:link href="http://www.allforgood.org/api/volopps?vol_loc=San+Francisco,CA&amp;output=rss&amp;key=LiftWeb" rel="self" type="application/rss+xml"/><description>All for Good search results</description><language>en-us</language><pubDate/><lastBuildDate>Tue, 15 Jun 2010 18:46:55 +0000</lastBuildDate>
+              {itemsXML}</channel></rss> , "application/rss+xml")
+          
           case _ => XmlResponse(sampleHtml)
         }
       }
