@@ -134,67 +134,71 @@
       } yield ret
       
 
+    def parseVolOpps(items: List[NodeSeq]): List[VolOppV1] =
+      for {
+        item <- items
+        } yield {
+        println(items)
+        VolOppV1(
+          (item \ "startDate").text,
+          (item \ "minAge").text,
+          (item \ "endDate").text,
+          (item \ "contactPhone").text,
+          (item \ "quality_score").text.toDouble,
+          (item \ "detailUrl").text,
+          (item \ "sponsoringOrganizationName").text,
+          (item \ "latlong").text,
+          (item \ "contactName").text,
+          (item \ "addr1").text,
+          (item \ "impressions").text.toInt,
+          (item \ "id").text,
+          (item \ "city").text,
+          (item \ "location_name").text,
+       Str((item \ "openEnded").text),
+          (item \ "pubDate").text,
+          (item \ "title").text,
+          (item \ "base_url").text,
+          (item \ "virtual").text,
+          (item \ "backfill_title").text,
+          (item \ "provider").text,
+          (item \ "postalCode").text,
+          (item \ "groupid").text,
+          (item \ "audienceAge").text,
+          (item \ "audienceAll").text,
+          (item \ "description").text,
+          (item \ "street1").text,
+          (item \ "street2").text,
+          (item \ "interest_count").text.toInt,
+          (item \ "xml_url").text,
+          (item \ "audienceSexRestricted").text,
+          (item \ "startTime").text.toInt,
+          (item \ "contactNoneNeeded").text,
+          (item \ "categories").text,
+          (item \ "contactEmail").text,
+          (item \ "skills").text,
+          (item \ "country").text,
+          (item \ "region").text,
+          (item \ "url_short").text,
+          (item \ "addrname1").text,
+          (item \ "backfill_number").text.toInt,
+          (item \ "endTime").text.toInt
+          )
+          }
+
+
     def viaRss(bytes: Array[Byte]): Box[RetV1] =
       for {
-        jString       <- tryo(new String(bytes, "UTF-8"))
-        xml           <- tryo(scala.xml.XML.loadString(jString))
-        rss           <- xml \ "rss"
-        channel       <- rss \ "channel"
-        lastBuildDate <- rss \ "lastBuildDate"
-        version       <- channel \ "version"
-        language      <- channel \ "language"
-        href          <- channel \ "atom:link"	// need to get href attribute, not value. how about rel and type attributes?
-        description   <- channel \ "description"
-        items         <- channel \ "item"
-        ret <- tryo(RetV1( lastBuildDate.toString, version.toString.toDouble, language.toString, href.toString, description.toString, items))
-     /*   volopps       <- VolOppV1(
-      Some(startDate),
-      Some(minAge),
-      Some(endDate),
-      contactPhone,
-      quality_score,
-      detailUrl,
-      sponsoringOrganizationName,
-      latlong,
-      contactName,
-      addr1,
-      impressions,
-      id,
-      city,
-      location_name,
-      openEnded,
-      pubDate,
-      title,
-      base_url,
-      virtual,
-      backfill_title,
-      provider,
-      postalCode,
-      groupid,
-      audienceAge,
-      audienceAll,
-      description,
-      street1,
-      street2,
-      interest_count,
-      xml_url,
-      audienceSexRestricted,
-      startTime,
-      contactNoneNeeded,
-      categories,
-      contactEmail,
-      skills,
-      country,
-      region,
-      url_short,
-      addrname1,
-      backfill_number,
-      endTime)  */
-     
-      } yield {
-        println();
-        ret
-        }
+        jString <- tryo(new String(bytes, "UTF-8"))
+        rss     <- tryo(scala.xml.XML.loadString(jString))
+        channel <- (rss \ "channel").headOption
+        ret     <- tryo(RetV1(
+                    (channel \ "lastBuildDate").text,
+                    (channel \ "version").text.toDouble,
+                    (channel \ "language").text,
+                    (channel \ "atom:link" \ "@href").text,
+                    (channel \ "description").text,
+                    parseVolOpps(channel \ "item")))
+        } yield ret
 
     // Returns RetV1 object from volopps API search
     def submitApiRequest(convert: Array[Byte] => Box[RetV1], pars: (String, Any)*): Box[RetV1] =
