@@ -42,6 +42,8 @@
     "api" should {
 
       "Give a 401 without a key" in {
+        println("*** Testing 401 ***")
+
         get("/api/volopps", "q" -> "hunger").map(_.code) must_== Full(401)
       }
 
@@ -186,7 +188,8 @@
           }
 
 
-    def viaRss(bytes: Array[Byte]): Box[RetV1] =
+    def viaRss(bytes: Array[Byte]): Box[RetV1] = {
+      println("==== IN via RSS ====")
       for {
         jString <- tryo(new String(bytes, "UTF-8"))
         rss     <- tryo(scala.xml.XML.loadString(jString))
@@ -199,6 +202,7 @@
                     (channel \ "description").text,
                     parseVolOpps(channel \ "item")))
         } yield ret
+    }
 
     // Returns RetV1 object from volopps API search
     def submitApiRequest(convert: Array[Byte] => Box[RetV1], pars: (String, Any)*): Box[RetV1] =
@@ -237,6 +241,7 @@ def testParams(f: Box[Box[RetV1] => Unit], p: (String, Any)*)(countTest: Int => 
     case x => fail(x.toString)
   }      
   
+
   val resRSS = submitApiRequest(viaRss _,"output" -> "rss" :: 
                              "key" -> "UnitTest" :: p.toList :_*)
   f.foreach(_.apply(resRSS))
@@ -247,8 +252,8 @@ def testParams(f: Box[Box[RetV1] => Unit], p: (String, Any)*)(countTest: Int => 
       for( item <- ret.items ) item must notBe( null )
     }
 
-    case x => fail(x.toString)
-  }      
+    case x => fail("RSS parsing failed... we got "+x)
+  }
 }
 
 def testParams(p: (String, Any)*)(countTest: Int => Unit) {
