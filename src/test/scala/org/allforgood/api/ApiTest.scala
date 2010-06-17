@@ -128,88 +128,85 @@
       
       implicit def formats = DefaultFormats
     
-    def viaJson(bytes: Array[Byte]): Box[RetV1] =
+    def viaJson(jString: String): Box[RetV1] =
       for {
-        jString <- tryo(new String(bytes, "UTF-8"))
         json <- tryo(JsonParser.parse(jString))
         ret <- tryo(json.extract[RetV1])
       } yield ret
       
+    def parseInt(s : String) = if (s == "") 0 else s.toInt
+    def parseDouble(s : String) = if (s == "") 0 else s.toDouble
+      
 
-    def parseVolOpps(items: List[NodeSeq]): List[VolOppV1] =
-      for {
-        item <- items
-        } yield {
-        println(items)
+    def parseVolOpp(item: NodeSeq): VolOppV1 = {
         VolOppV1(
-          (item \ "startDate").text,
-          (item \ "minAge").text,
-          (item \ "endDate").text,
-          (item \ "contactPhone").text,
-          (item \ "quality_score").text.toDouble,
-          (item \ "detailUrl").text,
-          (item \ "sponsoringOrganizationName").text,
-          (item \ "latlong").text,
-          (item \ "contactName").text,
-          (item \ "addr1").text,
-          (item \ "impressions").text.toInt,
-          (item \ "id").text,
-          (item \ "city").text,
-          (item \ "location_name").text,
+          (item \ "fp:startDate").text,
+          (item \ "fp:minAge").text,
+          (item \ "fp:endDate").text,
+          (item \ "fp:contactPhone").text,
+          parseDouble((item \ "fp:quality_score").text),
+          (item \ "fp:detailUrl").text,
+          (item \ "fp:sponsoringOrganizationName").text,
+          (item \ "fp:latlong").text,
+          (item \ "fp:contactName").text,
+          (item \ "fp:addr1").text,
+          parseInt((item \ "fp:impressions").text),
+          (item \ "fp:id").text,
+          (item \ "fp:city").text,
+          (item \ "fp:location_name").text,
        Str((item \ "openEnded").text),
-          (item \ "pubDate").text,
-          (item \ "title").text,
-          (item \ "base_url").text,
-          (item \ "virtual").text,
-          (item \ "backfill_title").text,
-          (item \ "provider").text,
-          (item \ "postalCode").text,
-          (item \ "groupid").text,
-          (item \ "audienceAge").text,
-          (item \ "audienceAll").text,
-          (item \ "description").text,
-          (item \ "street1").text,
-          (item \ "street2").text,
-          (item \ "interest_count").text.toInt,
-          (item \ "xml_url").text,
-          (item \ "audienceSexRestricted").text,
-          (item \ "startTime").text.toInt,
-          (item \ "contactNoneNeeded").text,
-          (item \ "categories").text,
-          (item \ "contactEmail").text,
-          (item \ "skills").text,
-          (item \ "country").text,
-          (item \ "region").text,
-          (item \ "url_short").text,
-          (item \ "addrname1").text,
-          (item \ "backfill_number").text.toInt,
-          (item \ "endTime").text.toInt
+          (item \ "fp:pubDate").text,
+          (item \ "fp:title").text,
+          (item \ "fp:base_url").text,
+          (item \ "fp:virtual").text,
+          (item \ "fp:backfill_title").text,
+          (item \ "fp:provider").text,
+          (item \ "fp:postalCode").text,
+          (item \ "fp:groupid").text,
+          (item \ "fp:audienceAge").text,
+          (item \ "fp:audienceAll").text,
+          (item \ "fp:description").text,
+          (item \ "fp:street1").text,
+          (item \ "fp:street2").text,
+          parseInt((item \ "fp:interest_count").text),
+          (item \ "fp:xml_url").text,
+          (item \ "fp:audienceSexRestricted").text,
+          parseInt((item \ "fp:startTime").text),
+          (item \ "fp:contactNoneNeeded").text,
+          (item \ "fp:categories").text,
+          (item \ "fp:contactEmail").text,
+          (item \ "fp:skills").text,
+          (item \ "fp:country").text,
+          (item \ "fp:region").text,
+          (item \ "fp:url_short").text,
+          (item \ "fp:addrname1").text,
+          parseInt((item \ "fp:backfill_number").text),
+          parseInt((item \ "fp:endTime").text)
           )
           }
 
 
-    def viaRss(bytes: Array[Byte]): Box[RetV1] = {
-      println("==== IN via RSS ====")
-      for {
-        jString <- tryo(new String(bytes, "UTF-8"))
-        rss     <- tryo(scala.xml.XML.loadString(jString))
-        channel <- (rss \ "channel").headOption
-        ret     <- tryo(RetV1(
-                    (channel \ "lastBuildDate").text,
-                    (channel \ "version").text.toDouble,
-                    (channel \ "language").text,
-                    (channel \ "atom:link" \ "@href").text,
-                    (channel \ "description").text,
-                    parseVolOpps(channel \ "item")))
-        } yield ret
+    def viaRss(jString: String): Box[RetV1] = {
+       val rss     = scala.xml.XML.loadString(jString)
+       val channel = (rss \ "channel")
+       val lBD  =  (channel \ "lastBuildDate").text
+       val vers =  parseDouble((channel \ "version").text)
+       val lang =  (channel \ "language").text
+       val link =  (channel \ "atom:link" \ "@href").text
+       val desc =  (channel \ "description").text
+       val items = (channel \ "item")
+       val opps =  items.map(parseVolOpp).toList
+       println(lBD, vers, lang, link, desc, items.length,opps.length)
+       tryo(RetV1(lBD, vers, lang, link, desc, opps))
     }
 
     // Returns RetV1 object from volopps API search
-    def submitApiRequest(convert: Array[Byte] => Box[RetV1], pars: (String, Any)*): Box[RetV1] =
+    def submitApiRequest(convert: String => Box[RetV1], pars: (String, Any)*): Box[RetV1] =
       for {
         answer <- get( "/api/volopps", pars :_* ).filter(_.code == 200)
         body <- answer.body
-        ret <- convert(body)
+        jString <- tryo(new String(body, "UTF-8"))
+        ret <- convert(jString)
       } yield ret
     
     def now = afgnow
