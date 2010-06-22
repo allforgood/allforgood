@@ -295,7 +295,9 @@ case class VolunteerOpportunity(
   description:Option[String],
   lastUpdated:Option[DateTimeOlsonDefaultPacific],
   expires:Option[DateTimeOlsonDefaultPacific]
-) 
+) {
+  def source: Option[FeedInfo] = None
+}
 
 case class ContactInfo(contactName:Option[String],
 		       contactPhone:Option[String],
