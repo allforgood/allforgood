@@ -6,17 +6,38 @@
 	<lift:embed what="modules/search/searchBoxSmall" />
 
 	<div class="columnContainerSearch">
-		<div class="leftColumn">
-			
-		
+		<div class="leftColumn">		
 		</div><!--.leftColumn-->
 		<div class="rightColumn">
-			
+            <lift:search>
+               <results:resultdiv>
+                   <div class="searchResult">
+                       <div class="resultLabel"><volop:label/></div>
+                       <div class="resultInfo">
+                           <h3><volop:urlandtitleanchor/></h3>
+                           <p class="whereWhen"><volop:location/><volop:startenddates/></p>
+                           <p class="what"><volop:what/></p>
+                           <p class="who"><volop:volorgname/> <span class="via">via</span> <volop:dataprovider/> - <span class="category">Category:</span> <volop:categoryname/></p>
+                       </div>
+                   </div>
+               </results:resultdiv>
+               <results:resultdivlast>
+                   <div class="searchResult last">
+                       <div class="resultLabel"><volop:label/></div>
+                       <div class="resultInfo">
+                           <h3><volop:urlandtitleanchor/></h3>
+                           <p class="whereWhen"><volop:location/><volop:startenddates/></p>
+                           <p class="what"><volop:what/></p>
+                           <p class="who"><volop:volorgname/> <span class="via">via</span> <volop:dataprovider/> - <span class="category">Category:</span> <volop:categoryname/></p>
+                       </div>
+                   </div>
+               </results:resultdivlast>
+            </lift:search>
 			<!-- search results mock-up -->
 			<!-- Each result uses the following html template,
 			     with the exception of the last result on the page,
 				 which should be have the class "last" on the containing div,
-				 like <div class="searchResult last"> -->
+				 like <div class="searchResult last"> -->                        <!--
 			<div class="searchResult">
 				<div class="resultLabel">A</div>
 				<div class="resultInfo">
@@ -35,7 +56,9 @@
 					</p>
 				</div>
 			</div>
+			-->
 			<!-- end search results mock-up -->
+            <!--
 			<div class="searchResult">
 				<div class="resultLabel">B</div>
 				<div class="resultInfo">
@@ -77,7 +100,9 @@
 					</p>
 				</div>
 			</div>
-		
+			-->
+
+<!--
 <p>=======================================================</p>	
 <h2>Search Results</h2>
 
@@ -93,8 +118,8 @@
       </tr>
       <lift:search>
 		<tr>
-		  <td>
-		    <results:sponsor/>
+		  <td>		    
+              <results:title/>
 		  </td>
 		  <td>
 		    <results:description/>
@@ -103,6 +128,7 @@
       </lift:search>
     </table>
   </p>
+-->
 			
 		</div><!--.rightColumn-->
 		<div class="clearColumns"></div><!--.clearColumns-->
