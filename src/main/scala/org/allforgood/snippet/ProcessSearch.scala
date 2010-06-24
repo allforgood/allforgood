@@ -41,6 +41,7 @@ object ProcessSearch {
     }
   */
 
+  val NumResultsPerPage = 10
   def render(in: NodeSeq): NodeSeq =
     for {
       q <- S.param("q").map(_.trim).filter(_.length > 0) ?~ "No query"
@@ -51,28 +52,46 @@ object ProcessSearch {
           geo <- Geocoder(l)
         } yield geo
 
+      val index = (S.param("index") openOr "-1").toInt
       val store = PersistenceFactory.store.vend
-      store.read(store.search(Full(q), loc = loc)) match {
+      val results =
+        store.read(store.search(Full(q), loc = loc))
+      val firstIndex = if (index < 0) 0 else index / NumResultsPerPage * NumResultsPerPage      
+      val lastIndex =
+        if (firstIndex + NumResultsPerPage > results.length ) results.length - 1 else firstIndex + NumResultsPerPage - 1
+      results.slice(firstIndex, lastIndex + 1) match {
         case Nil => Text("No opportunities matched your search")
         case xs => {
-          var volOpNum = 1
-          val volNumFmtStr = "%" + xs.length.toString().length + "d"
-          xs.init.zipWithIndex.flatMap{ x:((GUID, VolunteerOpportunity, Double),Int) => bind("volop",
+          val resNumFmtStr = "%1$" + xs.length.toString().length + "d"
+          xs.init.zip(List.range(firstIndex + 1, lastIndex + 1))
+                  .flatMap{ x:((GUID, VolunteerOpportunity, Double),Int) => bind("volop",
                                                 chooseTemplate("results",
                                                                "resultdiv",
                                                                in),
-                                                bindParams(x._1._2, x._2 + 1, volNumFmtStr): _*) } ++
+                                                bindParams(x._1._2, x._2, resNumFmtStr): _*) } ++
               bind("volop",
                    chooseTemplate("results",
                                   "resultdivlast",
                                   in),
-                   bindParams(xs.last._2, xs.length, volNumFmtStr): _*)
+                   bindParams(xs.last._2, lastIndex + 1, resNumFmtStr): _*) ++                   
+              bind("resultnav",
+                   chooseTemplate("results",
+                                  "resultnav",
+                                  in),
+                   "prevresults" -> (if ( firstIndex != 0 ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex - NumResultsPerPage)}>&lt;&lt; Prev</a> else NodeSeq.Empty),
+                   "nextresults" -> (if ( firstIndex + NumResultsPerPage < results.length ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex + NumResultsPerPage)}>Next &gt;&gt;</a> else NodeSeq.Empty))
+
         } : NodeSeq
       }
-    }  
+    }
 
-  def bindParams(vo: VolunteerOpportunity, volNum: Int, volNumFmtStr: String) = Array[BindParam] (
-          "label" -> Text(volNumFmtStr.format(volNum)),
+  def bindParams(vo: VolunteerOpportunity, resNum: Int, resNumFmtStr: String, q: String, loc: String, firstIndex: Int, resultsLength: Int): Array[BindParam] =  
+    bindParams(vo, resNum, resNumFmtStr) ++
+      Array[BindParam]("prevresults" -> (if ( firstIndex != 0 ) <a href={"/search?q=" + q + "&loc=" + loc + "&index=" + (firstIndex - NumResultsPerPage)}>&lt;&lt;Prev</a> else NodeSeq.Empty),
+                       "nextresults" -> (if ( firstIndex + NumResultsPerPage < resultsLength ) <a href={"/search?q=" + q + "&loc=" + loc + "&index=" + (firstIndex + NumResultsPerPage)}>Next&gt;&gt;</a> else NodeSeq.Empty))
+  
+  def bindParams(vo: VolunteerOpportunity, resNum: Int, resNumFmtStr: String) = Array[BindParam](
+          "label" -> Text(format(resNumFmtStr, resNum)),
           "urlandtitleanchor" ->
             <a href={vo.detailURL.getOrElse("javascript:void(0)")}>{ vo.title }</a>,
           "location" ->
@@ -88,9 +107,8 @@ object ProcessSearch {
           "what" ->
             Text( { val desc = vo.description.getOrElse(""); if (desc.length > 320) desc.substring(0, 319) + "..." else desc } ),
           "volorgname" -> (if ( vo.organizations.isEmpty ) NodeSeq.Empty else Text(vo.organizations.head.name)),
-          "dataprovider" -> NodeSeq.Empty,
+          "dataprovider" -> (if ( vo.source eq None ) NodeSeq.Empty else Text(vo.source.get.providerName)),
           "categoryname" -> Text(vo.categoryTags.mkString(", ")) )
-
 
   implicit def bnsToNS(in: Box[NodeSeq]): NodeSeq = in match {
     case Full(i) => i
