@@ -53,6 +53,7 @@ test-output
 
 # properties files
 dpp.props
+imtiaz.props
 
 # test data
 test_data

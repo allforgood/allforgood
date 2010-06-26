@@ -118,4 +118,29 @@ object ProcessSearch {
       S.redirectTo(S.referer openOr "/")
   }
 
+  def setSearchLocFromCookie =
+    <script type="text/javascript">
+      (function() {{
+        searchLocCookieName = 'searchlocation'
+        allCookies = document.cookie
+        var pos = allCookies.indexOf(searchLocCookieName + '=');
+        if ( pos != -1 ) {{
+          var start = pos + searchLocCookieName.length + 1
+          var end = allCookies.indexOf( ';', start)
+          if ( end == -1 ) end = allCookies.length
+          searchLoc = allCookies.substring(start,end)
+        }}
+        if ( ! searchLoc )
+          searchLoc = BrowserLocation
+        if ( document.getElementById('loc') )
+          document.getElementById('loc').value = searchLoc
+        var elem = document.getElementById('loc');
+        elem.onchange =
+          'document.cookie.replace(searchLocCookieName + '=' + '.*',
+                                   searchLocCookieName + '=' + elem.value)'
+      }})()
+
+    </script>
+
+
 }

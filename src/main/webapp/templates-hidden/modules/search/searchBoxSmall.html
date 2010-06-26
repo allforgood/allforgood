@@ -1,5 +1,5 @@
 <div class="searchBoxSmall">
-	<form method="get" action="/search">
+	<form method="get" action="/search" name="searchBoxSmall">
 		<div class="inputBg">
 			<input type="text" id="q" class="faded" name="q" value="find" 
 				onfocus="if (this.className.indexOf('faded') >= 0) { this.value = ''; this.className = this.className.replace('faded',''); } else { this.select(); }"
@@ -8,7 +8,7 @@
 		</div>
 		<input type="submit" id="find" value="&#8203;" />
 		<!-- temporary addition until we figure out geolocation stuff -->
-		<br /><label for="loc">Location</label><input id="loc" name="loc" />
+		<br/><label for="loc">Location</label><input id="loc" name="loc" onchange="setSearchLocCookie(this.value)"/>        
 		<!-- end temporary addition -->
 	</form>
 </div>

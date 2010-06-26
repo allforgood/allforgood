@@ -4,12 +4,12 @@
 <head>
 	<link href="/new_html/src/style.css" rel="stylesheet"/>
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-  
+    <lift:GoogleApiLoad/>
+    <script type="text/javascript" src="script/afglib.js"/>
 <title>All for Good - Find and Share ways to do Good.</title>
-
 	
 </head>
-<body>
+<body onload="document.getElementById('loc').value=getSearchLoc()">
 	<div class="fixedWidthContent">
 		<div class="header">
 			<h1><a href="http://localhost:8080/"><img alt="All for Good (beta)" src="images/header-fg-logo-afg.png"/></a></h1>
@@ -27,8 +27,8 @@
 					</div>
 					<input type="submit" value="" id="find"/>
 					<!-- temporary addition until we figure out geolocation stuff -->
-					<br/><label for="loc">Location</label><input name="loc" id="loc" class="inputBox" />
-					<!-- end temporary addition -->
+					<br/><label for="loc">Location</label><input name="loc" id="loc" class="inputBox" onchange="setSearchLocCookie(this.value)"/>
+                    <!-- end temporary addition -->
 				</form>
 			</div>
 			

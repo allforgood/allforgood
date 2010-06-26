@@ -6,7 +6,7 @@
 		/>
 		<input type="submit" id="find" value="&#8203;" />
 		<!-- temporary addition until we figure out geolocation stuff -->
-		<br /><label for="loc">Location</label><input id="loc" name="loc" />
-		<!-- end temporary addition -->
+		<br /><label for="loc">Location</label><input id="loc" name="loc" onchange="setSearchLocCookie(this.value)"/>
+        <!-- end temporary addition -->
 	</form>
 </div>
