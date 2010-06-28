@@ -1,0 +1,3 @@
+$(function() {
+    $('#loc').val(getSearchLoc());
+});

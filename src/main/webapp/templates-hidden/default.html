@@ -5,9 +5,14 @@
 	<link rel="stylesheet" href="/resources/style/front.css" />
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <lift:GoogleApiLoad/>
-    <script type="text/javascript" src="script/afglib.js"/>
+    <script id="jquery" src="/classpath/jquery.js" />
+    <script id="json" src="/classpath/json.js" />
+    <script type="text/javascript" src="scripts/jquery.cookie.js"></script>
+    <script type="text/javascript" src="scripts/afglib.js"/>
+    <script type="text/javascript" src="scripts/afginit.js"/>
 </head>
 
+<!--<body onload="document.getElementById('loc').value=getSearchLoc()">-->
 <body onload="document.getElementById('loc').value=getSearchLoc()">
 	<div class="fixedWidthContent">
 		<div class="header">
@@ -26,7 +31,9 @@
 			</div>	
 		</div><!--.mainContent-->
 	</div><!--.fixedWidthContent-->
+    <!--
     <script id="jquery" src="/classpath/jquery.js" />
     <script id="json" src="/classpath/json.js" />
+    -->
 </body>
 </html>
