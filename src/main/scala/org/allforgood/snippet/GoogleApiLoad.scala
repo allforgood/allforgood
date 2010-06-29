@@ -17,25 +17,30 @@ package org.allforgood.snippet
  *
  */
 
-class GoogleApiLoad {
-  import scala.xml.NodeSeq
-  def render = {
-    import net.liftweb.util.Props
-    import scala.xml.NodeSeq
-    val key = Props.get("googleapi.key", "")
-    if ( key != "")
-      <script type="text/javascript"
-          src={"http://www.google.com/jsapi?key=" + key}></script> ++
-      <script type="text/javascript">
+import scala.xml.NodeSeq
+import net.liftweb._
+import util._
+import http.js._
+import JsCmds._
+import JE._
+
+object GoogleApiLoad {
+  def render: NodeSeq = 
+    Props.get("googleapi.key") map {
+      key =>
+        <script type="text/javascript"
+      src={"http://www.google.com/jsapi?key=" + key}/> ++
+      Script(JsRaw("""
         google.setOnLoadCallback(initialize);
         google.load('maps', '2');
-        function initialize() {{
+        function initialize() {
             if (google.loader.ClientLocation)
-              window.BrowserLocationCity = google.loader.ClientLocation.address.city;            
-        }}
-      </script>
-    else
-      NodeSeq.Empty
-  }  
+              window.BrowserLocationCity = 
+                google.loader.ClientLocation.address.city;            
+        }
+     """))
+    } openOr Script(JsRaw("""
+                          alert('You need to install the API key');
+                          """))
 }
 

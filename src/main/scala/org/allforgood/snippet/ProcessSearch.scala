@@ -15,33 +15,11 @@ import model._
 import geocode._
 
 object ProcessSearch {
-  import scala.xml.NodeSeq
-  import org.apache.log4j.Category
-  /*
-  def render(in: NodeSeq): NodeSeq = 
-    for {
-      q <- S.param("q").map(_.trim).filter(_.length > 0) ?~ "No query"
-    } yield {
-      val loc: Option[GeoLocation] = 
-        for {
-          l <- S.param("loc").map(_.trim).filter(_.length > 0)
-          geo <- Geocoder(l)
-        } yield geo
-
-      val store = PersistenceFactory.store.vend
-      store.read(store.search(Full(q), loc = loc)) match {
-        case Nil => Text("No results")
-        case xs => xs.flatMap{
-          case (guid, vo, _) => bind("results", in,
-                                  "title" -> vo.title,
-                                  "description" -> 
-                                  (vo.description getOrElse "N/A"))
-        } : NodeSeq
-      }
-    }
-  */
-
   val NumResultsPerPage = 10
+  
+  def intParam(name: String): Box[Int] =
+    S.param(name).flatMap(Helpers.asInt).filter(_ > 0)
+
   def render(in: NodeSeq): NodeSeq =
     for {
       q <- S.param("q").map(_.trim).filter(_.length > 0) ?~ "No query"
@@ -52,35 +30,40 @@ object ProcessSearch {
           geo <- Geocoder(l)
         } yield geo
 
-      val index = (S.param("index") openOr "-1").toInt
+      val start = intParam("start") openOr 0
+
+      val num = (intParam("num") openOr 10) + 1
+
       val store = PersistenceFactory.store.vend
       val results =
-        store.read(store.search(Full(q), loc = loc))
-      val firstIndex = if (index < 0) 0 else index / NumResultsPerPage * NumResultsPerPage      
-      val lastIndex =
-        if (firstIndex + NumResultsPerPage > results.length ) results.length - 1 else firstIndex + NumResultsPerPage - 1
-      results.slice(firstIndex, lastIndex + 1) match {
+        store.read(store.search(Full(q), loc = loc,
+                              start = start, num = num))
+
+      results match {
         case Nil => Text("No opportunities matched your search")
         case xs => {
           val resNumFmtStr = "%1$" + xs.length.toString().length + "d"
-          xs.init.zip(List.range(firstIndex + 1, lastIndex + 1))
-                  .flatMap{ x:((GUID, VolunteerOpportunity, Double),Int) => bind("volop",
-                                                chooseTemplate("results",
-                                                               "resultdiv",
-                                                               in),
-                                                bindParams(x._1._2, x._2, resNumFmtStr): _*) } ++
-              bind("volop",
-                   chooseTemplate("results",
-                                  "resultdivlast",
-                                  in),
-                   bindParams(xs.last._2, lastIndex + 1, resNumFmtStr): _*) ++                   
-              bind("resultnav",
-                   chooseTemplate("results",
-                                  "resultnav",
-                                  in),
-                   "prevresults" -> (if ( firstIndex != 0 ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex - NumResultsPerPage)}>&lt;&lt; Prev</a> else NodeSeq.Empty),
-                   "nextresults" -> (if ( firstIndex + NumResultsPerPage < results.length ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex + NumResultsPerPage)}>Next &gt;&gt;</a> else NodeSeq.Empty))
-
+          (xs take (num - 1)).zipWithIndex.
+                  flatMap{ 
+                    case ((guid, volopp, rank), pos) =>
+                      bind("volop",
+                           chooseTemplate("results",
+                                          "resultdiv",
+                                          in),
+                           bindParams(volopp, pos + start, resNumFmtStr): _*)
+                  } ++
+          bind("volop",
+               chooseTemplate("results",
+                              "resultdivlast",
+                              in),
+               bindParams(xs.last._2, lastIndex + 1, resNumFmtStr): _*) ++                   
+          bind("resultnav",
+               chooseTemplate("results",
+                              "resultnav",
+                              in),
+               "prevresults" -> (if ( firstIndex != 0 ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex - NumResultsPerPage)}>&lt;&lt; Prev</a> else NodeSeq.Empty),
+               "nextresults" -> (if ( firstIndex + NumResultsPerPage < results.length ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex + NumResultsPerPage)}>Next &gt;&gt;</a> else NodeSeq.Empty))
+          
         } : NodeSeq
       }
     }
@@ -119,28 +102,25 @@ object ProcessSearch {
   }
 
   def setSearchLocFromCookie =
-    <script type="text/javascript">
-      (function() {{
-        searchLocCookieName = 'searchlocation'
-        allCookies = document.cookie
+    Script(JsRaw("""
+      (function() {
+        searchLocCookieName = 'searchlocation';
+        allCookies = document.cookie;
         var pos = allCookies.indexOf(searchLocCookieName + '=');
-        if ( pos != -1 ) {{
-          var start = pos + searchLocCookieName.length + 1
-          var end = allCookies.indexOf( ';', start)
-          if ( end == -1 ) end = allCookies.length
-          searchLoc = allCookies.substring(start,end)
-        }}
+        if ( pos != -1 ) {
+          var start = pos + searchLocCookieName.length + 1;
+          var end = allCookies.indexOf( ';', start);
+          if ( end == -1 ) end = allCookies.length;
+          searchLoc = allCookies.substring(start,end);
+        }
         if ( ! searchLoc )
-          searchLoc = BrowserLocation
+          searchLoc = BrowserLocation;
         if ( document.getElementById('loc') )
-          document.getElementById('loc').value = searchLoc
+          document.getElementById('loc').value = searchLoc;
         var elem = document.getElementById('loc');
         elem.onchange =
           'document.cookie.replace(searchLocCookieName + '=' + '.*',
-                                   searchLocCookieName + '=' + elem.value)'
+                                   searchLocCookieName + '=' + elem.value)';
       }})()
-
-    </script>
-
-
+    """))
 }
