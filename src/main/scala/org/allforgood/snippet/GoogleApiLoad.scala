@@ -20,6 +20,7 @@ package org.allforgood.snippet
 import scala.xml.NodeSeq
 import net.liftweb._
 import util._
+import Helpers._
 import http.js._
 import JsCmds._
 import JE._
@@ -29,7 +30,7 @@ object GoogleApiLoad {
     Props.get("googleapi.key") map {
       key =>
         <script type="text/javascript"
-      src={"http://www.google.com/jsapi?key=" + key}/> ++
+      src={"http://www.google.com/jsapi?key=" + urlEncode(key)}/> ++
       Script(JsRaw("""
         google.setOnLoadCallback(initialize);
         google.load('maps', '2');

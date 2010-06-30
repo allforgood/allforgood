@@ -257,7 +257,7 @@ div.footer div.column div.rightColumn {
 div.searchBoxSmall {
 	background: url("../images/searchBox-bg-small.png") no-repeat scroll 0 0 transparent;
 	height: 108px;
-	margin: -33px 0 20px 295px;
+	/* margin: -33px 0 20px 295px; */
 }
 div.searchBoxSmall div.inputBg {
 	background: url("../images/searchBox-fg-input.png") no-repeat scroll 0 0 transparent;

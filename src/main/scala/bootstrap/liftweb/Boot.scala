@@ -49,6 +49,17 @@ class Boot {
     
     LiftRules.passNotFoundToChain = false
 
+  /**
+   * The maximum allowed size of a complete mime multi-part POST.  Default 8MB
+   */
+    LiftRules.maxMimeSize = 200 * 1024 * 1024
+
+    /**
+     * The maximum allowed size of a single file in a mime multi-part POST.
+     * Default 7MB
+     */
+    LiftRules.maxMimeFileSize = 200 * 1024 * 1024
+
     /*
     LiftRules.liftRequest.append {
       case Req("static" :: _, _, _) => false

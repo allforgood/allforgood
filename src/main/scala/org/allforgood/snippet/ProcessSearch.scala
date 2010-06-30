@@ -1,9 +1,12 @@
 package org.allforgood
 package snippet
 
-import scala.xml.{NodeSeq, Text}
+import scala.xml.{NodeSeq, Text, Node}
 import net.liftweb.util._
 import net.liftweb.http._
+import js._
+import JsCmds._
+import JE._
 import net.liftweb.common._
 import org.allforgood.lib._
 import Helpers._
@@ -13,6 +16,8 @@ import net.liftweb.http.testing._
 
 import model._
 import geocode._
+import java.text.SimpleDateFormat
+import java.util.Date
 
 object ProcessSearch {
   val NumResultsPerPage = 10
@@ -22,6 +27,7 @@ object ProcessSearch {
 
   def render(in: NodeSeq): NodeSeq =
     for {
+      req <- S.request
       q <- S.param("q").map(_.trim).filter(_.length > 0) ?~ "No query"
     } yield {
       val loc: Option[GeoLocation] =
@@ -32,95 +38,121 @@ object ProcessSearch {
 
       val start = intParam("start") openOr 0
 
-      val num = (intParam("num") openOr 10) + 1
+      val num = (intParam("num") openOr 10)
 
       val store = PersistenceFactory.store.vend
       val results =
         store.read(store.search(Full(q), loc = loc,
-                              start = start, num = num))
+                              start = start, num = num + 1))
+
+      def calcLink(start: Int): String = 
+        req.uri +
+        "?start="+start+
+        req.params.toList.filter(_._1 != "start").flatMap{
+          case (key, values) => values.map(v => urlEncode(key)+"="+urlEncode(v))
+        }.mkString("&", "&", "")
+        
 
       results match {
         case Nil => Text("No opportunities matched your search")
         case xs => {
-          val resNumFmtStr = "%1$" + xs.length.toString().length + "d"
-          (xs take (num - 1)).zipWithIndex.
-                  flatMap{ 
-                    case ((guid, volopp, rank), pos) =>
-                      bind("volop",
-                           chooseTemplate("results",
-                                          "resultdiv",
-                                          in),
-                           bindParams(volopp, pos + start, resNumFmtStr): _*)
-                  } ++
-          bind("volop",
-               chooseTemplate("results",
-                              "resultdivlast",
-                              in),
-               bindParams(xs.last._2, lastIndex + 1, resNumFmtStr): _*) ++                   
-          bind("resultnav",
-               chooseTemplate("results",
-                              "resultnav",
-                              in),
-               "prevresults" -> (if ( firstIndex != 0 ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex - NumResultsPerPage)}>&lt;&lt; Prev</a> else NodeSeq.Empty),
-               "nextresults" -> (if ( firstIndex + NumResultsPerPage < results.length ) <a href={"/search?q=" + q + "&loc=" + loc.getOrElse("") + "&index=" + (firstIndex + NumResultsPerPage)}>Next &gt;&gt;</a> else NodeSeq.Empty))
           
+          def dateFormat(date: Long): String = 
+            (new SimpleDateFormat("MMM d").format(new Date(date)))
+
+          def doPrev(in: NodeSeq): NodeSeq =
+            if (start == 0) NodeSeq.Empty
+          else <a href={calcLink(math.max(0, (start - 10)))}>{in}</a>
+
+          def doNext(in: NodeSeq): NodeSeq = 
+            if (num > xs.length) NodeSeq.Empty
+          else <a href={calcLink(start + 10)}>{in}</a>
+
+          def doItems(in: NodeSeq): NodeSeq = {
+            import scala.collection.mutable.ListBuffer
+            val ret: ListBuffer[Node] = new ListBuffer()
+
+            def bindOne(items: List[(GUID, VolunteerOpportunity, Double)], 
+                        pos: Int) {
+              def doBind(op: VolunteerOpportunity,
+                       last: Boolean = false) = {
+                val bound = 
+                  bind("volop", in,
+                       AttrBindParam("class", "searchResults" +
+                                     (if (last) " last" else ""),
+                                     "class"),
+                       "label" -> (('A'.toInt + pos).toChar).toString,
+                       ("urlandtitleanchor" ->
+                        <a href={op.detailURL.
+                                 getOrElse("javascript:void(0)")}
+                        >{op.title}</a>),
+                       OptionBindParam("location",
+                                       for {
+                                         loc <- op.locations.headOption
+                                         city <- loc.city
+                                       } yield 
+                                         Text(city + 
+                                              " " + 
+                                              (loc.postalCode.getOrElse("")))),
+                       OptionBindParam("startenddates",
+                                       for {
+                                         dur <- 
+                                         op.dateTimeDurations.headOption
+                                         start <- dur.startDate
+                                         end <- dur.endDate
+                                       } yield
+                                         Text(dateFormat(start) +
+                                              " - "+
+                                              dateFormat(end))),
+                       OptionBindParam("what",
+                                       op.description.
+                                       map(str => Text(
+                                         if (str.length > 319)
+                                           str.substring(0,319) + "..."
+                                         else str))),
+                       OptionBindParam("volorgname",
+                                       for {
+                                         org <-
+                                         op.organizations.headOption
+                                       } yield Text(org.name)),
+                       OptionBindParam("dataprovider",
+                                       op.source.map(v => 
+                                         Text(v.providerName))),
+                       "categoryname" -> op.categoryTags.mkString(", ")
+                     )
+                ret ++= bound
+              }
+
+              
+              items match {
+                case Nil =>
+                case (guid, op, rank) :: Nil =>
+                  doBind(op, true)
+                case (guid, op, rank) :: xs => 
+                  doBind(op)
+                  bindOne(xs, pos + 1)
+              }
+            }
+
+            bindOne(xs, 0)
+
+            ret.toList
+          }
+
+
+          bind("results", in,
+               "resultsdiv" -> doItems _,
+               "prev" -> doPrev _,
+               "next" -> doNext _)
         } : NodeSeq
       }
     }
 
-  def bindParams(vo: VolunteerOpportunity, resNum: Int, resNumFmtStr: String, q: String, loc: String, firstIndex: Int, resultsLength: Int): Array[BindParam] =  
-    bindParams(vo, resNum, resNumFmtStr) ++
-      Array[BindParam]("prevresults" -> (if ( firstIndex != 0 ) <a href={"/search?q=" + q + "&loc=" + loc + "&index=" + (firstIndex - NumResultsPerPage)}>&lt;&lt;Prev</a> else NodeSeq.Empty),
-                       "nextresults" -> (if ( firstIndex + NumResultsPerPage < resultsLength ) <a href={"/search?q=" + q + "&loc=" + loc + "&index=" + (firstIndex + NumResultsPerPage)}>Next&gt;&gt;</a> else NodeSeq.Empty))
-  
-  def bindParams(vo: VolunteerOpportunity, resNum: Int, resNumFmtStr: String) = Array[BindParam](
-          "label" -> Text(format(resNumFmtStr, resNum)),
-          "urlandtitleanchor" ->
-            <a href={vo.detailURL.getOrElse("javascript:void(0)")}>{ vo.title }</a>,
-          "location" ->
-            (if ( vo.locations.isEmpty ) NodeSeq.Empty else Text(vo.locations.head.city.getOrElse("") + " " + vo.locations.head.postalCode.getOrElse("") + " -" )),
-          "startenddates" -> {
-            import java.util.Date
-            import java.text.SimpleDateFormat
-            val df = new SimpleDateFormat("MMM d")
-            val startDate = vo.dateTimeDurations.head.startDate.getOrElse(new Date)
-            val endDate = vo.dateTimeDurations.head.startDate.getOrElse(new Date)
-            Text(" " + df.format(startDate) + " - " + df.format(endDate))
-          },
-          "what" ->
-            Text( { val desc = vo.description.getOrElse(""); if (desc.length > 320) desc.substring(0, 319) + "..." else desc } ),
-          "volorgname" -> (if ( vo.organizations.isEmpty ) NodeSeq.Empty else Text(vo.organizations.head.name)),
-          "dataprovider" -> (if ( vo.source eq None ) NodeSeq.Empty else Text(vo.source.get.providerName)),
-          "categoryname" -> Text(vo.categoryTags.mkString(", ")) )
-
-  implicit def bnsToNS(in: Box[NodeSeq]): NodeSeq = in match {
+  private implicit def bnsToNS(in: Box[NodeSeq]): NodeSeq = in match {
     case Full(i) => i
     case Failure(msg, _, _) => S.error(msg); 
       S.redirectTo(S.referer openOr "/")
     case _ =>
       S.redirectTo(S.referer openOr "/")
   }
-
-  def setSearchLocFromCookie =
-    Script(JsRaw("""
-      (function() {
-        searchLocCookieName = 'searchlocation';
-        allCookies = document.cookie;
-        var pos = allCookies.indexOf(searchLocCookieName + '=');
-        if ( pos != -1 ) {
-          var start = pos + searchLocCookieName.length + 1;
-          var end = allCookies.indexOf( ';', start);
-          if ( end == -1 ) end = allCookies.length;
-          searchLoc = allCookies.substring(start,end);
-        }
-        if ( ! searchLoc )
-          searchLoc = BrowserLocation;
-        if ( document.getElementById('loc') )
-          document.getElementById('loc').value = searchLoc;
-        var elem = document.getElementById('loc');
-        elem.onchange =
-          'document.cookie.replace(searchLocCookieName + '=' + '.*',
-                                   searchLocCookieName + '=' + elem.value)';
-      }})()
-    """))
 }

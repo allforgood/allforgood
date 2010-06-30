@@ -1,0 +1,85 @@
+<lift:surround with="default" at="content">
+  <head>
+    <title>All for Good - Find and Share ways to do Good.</title>
+  </head>
+  
+  <div style="margin: -33px 0 20px 295px;">
+    <lift:embed what="/modules/search/searchBoxSmall" />
+  </div>
+  
+  <div class="columnContainerSearch">
+    <div class="leftColumn">		
+      <div class="refineSearch">
+	<div class="heading">Refine Your Search</div>
+	<div class="inside">
+	  
+	  <form action="" method="get">				
+	    <div class="row">
+	      <div class="smallTitle"><img src="/images/arrow-down.png" alt="" />Categories</div>
+	      <select name="">
+		<option value="Education">Education</option>
+		<option value="Education">Education</option>
+		<option value="Education">Education</option>
+	      </select>
+	    </div>
+	    
+	    <div class="row">
+	      <div class="smallTitle"><img src="/images/arrow-down.png" alt="" />When</div>
+	      <input type="radio" value="Anytime" />Anytime<br />
+	      <input type="radio" value="Today" />Today<br />
+	      <input type="radio" value="This week" />This week<br />
+	      <input type="radio" value="This month" />This month<br />
+	      <input type="radio" value="This weekend" />This weekend<br />
+	      <input type="radio" value="Starting" />Starting Oct. 5 2010
+	    </div>
+	    
+	    <div class="row">
+	      <div class="smallTitle"><img src="images/arrow-down.png" alt="" />Location</div>
+	      <input type="text" value="Your location" />
+	      <input type="image" src="images/btn-refineSeach-apply.gif" class="btn" />
+	    </div>
+	    
+	    <div class="row">
+	      <img src="images/map-placeholder.gif" alt="" />
+	    </div>
+	    
+	    <div class="row">
+	      <div class="smallTitle"><img src="images/arrow-down.png" alt="" />Location</div>
+	      <input type="checkbox" value="1 day" /> 1 day
+	      <input type="checkbox" value="Multi-day" /> Multi-day
+	    </div>
+	    
+	    <div class="row">
+	      <div class="smallTitle"><img src="images/arrow-left.png" alt="" />Organization</div>
+	    </div>
+	    
+	    <div class="row">
+	      <div class="smallTitle"><img src="images/arrow-left.png" alt="" />Tags</div>
+	    </div>
+	  </form>
+	  
+	</div>
+      </div><!--.refineSearch-->
+    </div><!--.leftColumn-->
+    <div class="rightColumn">
+      <lift:search>
+        <results:resultsdiv>
+          <div volop:class="searchResult">
+            <div class="resultLabel"><volop:label/></div>
+            <div class="resultInfo">
+              <h3><volop:urlandtitleanchor/></h3>
+              <p class="whereWhen"><volop:location/> 
+		<volop:startenddates/></p>
+              <p class="what"><volop:what/></p>
+              <p class="who"><volop:volorgname/> <span class="via">via</span> <volop:dataprovider/> - <span class="category">Category:</span> <volop:categoryname/></p>
+            </div>
+          </div>
+        </results:resultsdiv>
+	
+        <span><results:prev>Prev</results:prev> <results:next>Next</results:next></span>
+
+      </lift:search>            
+    </div><!--.rightColumn-->
+    <div class="clearColumns"></div><!--.clearColumns-->
+  </div><!--.columnContainerSearch-->
+</lift:surround>

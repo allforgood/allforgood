@@ -1,14 +1,18 @@
 <div class="searchBoxSmall">
-	<form method="get" action="/search" name="searchBoxSmall">
-		<div class="inputBg">
-			<input type="text" id="q" class="faded" name="q" value="find" 
-				onfocus="if (this.className.indexOf('faded') >= 0) { this.value = ''; this.className = this.className.replace('faded',''); } else { this.select(); }"
-		    	onblur="if (! this.value) { this.value = 'find'; this.className += ' faded'; }"
-			/>
-		</div>
-		<input type="submit" id="find" value="&#8203;" />
-		<!-- temporary addition until we figure out geolocation stuff -->
-		<br/><label for="loc">Location</label><input id="loc" name="loc" onchange="setSearchLocCookie(this.value)"/>        
-		<!-- end temporary addition -->
-	</form>
+  <form method="get" action="/search" name="searchBoxSmall">
+    <lift:PopulateFind>
+      <div class="inputBg">
+	<input type="text" id="q" populate:class="faded" 
+	       name="q" populate:ivalue=""
+	       onfocus="if (this.className.indexOf('faded') >= 0) { this.value = ''; this.className = this.className.replace('faded',''); } else { this.select(); }"
+	       onblur="if (! this.value) { this.value = 'find'; this.className += ' faded'; }"
+	       />
+      </div>
+      <input type="submit" id="find" value="&#8203;" />
+      <br/><label for="loc">Location</label>
+      <input id="loc" name="loc" 
+	     onchange="setSearchLocCookie(this.value)"
+	     populate:lvalue=""/>
+    </lift:PopulateFind>
+  </form>
 </div>
