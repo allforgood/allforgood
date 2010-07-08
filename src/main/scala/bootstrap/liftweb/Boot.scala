@@ -27,8 +27,8 @@ import api._
  * to modify lift's environment
  */
 class Boot {
-  implicit def toFunc(in: {def render(in: NodeSeq): NodeSeq}):
-  NodeSeq => NodeSeq = param => in.render(param)
+  //implicit def toFunc(in: {def render(in: NodeSeq): NodeSeq}):
+  // NodeSeq => NodeSeq = param => in.render(param)
     
   def boot {
     if (!DB.jndiJdbcConnAvailable_?) {
@@ -42,6 +42,9 @@ class Boot {
 
       DB.defineConnectionManager(DefaultConnectionIdentifier, vendor)
     }
+
+    Schemifier.schemify(true, Schemifier.infoF _, User)
+
 
     if (Props.testMode) {
       AfgDate.calcDateTimeFunc = Some(() => new DateTime("2008-12-28"))
@@ -60,19 +63,13 @@ class Boot {
      */
     LiftRules.maxMimeFileSize = 200 * 1024 * 1024
 
-    /*
-    LiftRules.liftRequest.append {
-      case Req("static" :: _, _, _) => false
-    }
-    */
-
     LiftRules.snippetDispatch.append{case "Loc" => MenuData}
 
     // where to search snippet
     LiftRules.addToPackages("org.allforgood")
 
 
-    LiftRules.setSiteMapFunc(MenuData.siteMap) // () => SiteMap(entries:_*))
+    LiftRules.setSiteMapFunc(MenuData.siteMap)
 
     /*
      * Show the spinny image when an Ajax call starts
@@ -94,11 +91,6 @@ class Boot {
       case r @ Req("api" :: "volopps" :: Nil, _, _) =>
         () => Full(Api.volopps(r))
     }
-
-    /*
-    LiftRules.snippetDispatch.append {
-      case "DoYouLikeCats" => DoYouLikeCats
-    }*/
 
 
     S.addAround(DB.buildLoanWrapper)

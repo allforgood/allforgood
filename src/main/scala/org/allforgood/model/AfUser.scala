@@ -4,6 +4,7 @@ package model
 import net.liftweb._
 import mapper._
 
+/*
 /**
  * This model class represents the most basic type of User...
  * just the username, a unique primary key, there can be
@@ -56,3 +57,4 @@ object UserNameAlias extends UserNameAlias with
 LongKeyedMetaMapper[UserNameAlias] {
   override def dbIndexes = UniqueIndex(identifier, idType) :: super.dbIndexes
 }
+*/

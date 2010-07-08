@@ -35,19 +35,24 @@ object MenuData extends DispatchSnippet {
     faq,
     tos)
 
+  private lazy val ifSuperUser = If(model.User.superUser_? _, 
+                                  S ? "You must be a super user")
+
       // Build SiteMap
   def siteMap(): SiteMap = SiteMap(
-    Menu.i(home) / "index",
-    Menu(apiDocs, S ? "API Docs") / "docs" / "api",
-    Menu(xmlUpload, "XML Upload") / "xml_upload" >>
-    XmlUploadSnippet.menuParams,
-    Menu.i(search) / "search" >> 
-      Hidden >>  Snippet("search", a => ProcessSearch.render(a)),
-    Menu.i(about) / "about",
-    Menu(contact, S ? "Contact Us") / "contact",
-    Menu(faq, S ? "faq") / "faq",
-    Menu(tos, S ? "Terms of Service") / "tos"
-  )
+    List(Menu.i(home) / "index",
+         Menu(apiDocs, S ? "API Docs") / "docs" / "api",
+         Menu(xmlUpload, "XML Upload") / "xml_upload" >>
+         XmlUploadSnippet.menuParams,
+         Menu.i(search) / "search" >> 
+         Hidden >>  Snippet("search", a => ProcessSearch.render(a)),
+         Menu.i(about) / "about",
+         Menu(contact, S ? "Contact Us") / "contact",
+         Menu(faq, S ? "faq") / "faq",
+         Menu(tos, S ? "Terms of Service") / "tos",
+       Menu("Manage Users", S ? "Manage Users") / "manage_users" >>
+       ifSuperUser) :::
+    model.User.menus :_*)
 
   def dispatch = {
     case x if nameSet.contains(x) => 

@@ -1,0 +1,14 @@
+<lift:surround with="default" at="content">
+  <div>
+    Unverified Users:
+    <ul id="userinfo">
+      <lift:VerifyUsers>
+	<li><user:name/>: <user:accept/> <user:reject/></li>
+      </lift:VerifyUsers>
+    </ul>
+  </div>
+
+  <div>
+    <lift:AddUser/>
+  </div>
+</lift:surround>
