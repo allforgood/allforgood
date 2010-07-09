@@ -53,7 +53,7 @@ test-output
 
 # properties files
 dpp.props
-production.neptune.props
+*.props
 imtiaz.props
 
 # test data
