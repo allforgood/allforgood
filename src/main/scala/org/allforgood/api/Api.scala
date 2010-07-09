@@ -104,7 +104,8 @@ object Api {
     }
   }
 
-  def validateKey(key: String): Box[String] = KeyManager.validateKey(key) // Full(key)
+  def validateKey(key: String): Box[String] = 
+    Full(key).filter(PartnerKey.valid_?)
 
   val missingKey =
     """You seem to be missing the API key parameter ('key') in your query.
@@ -125,6 +126,7 @@ object Api {
   </rss>
 }
 
+/*
 object KeyManager {
   @volatile private var validKeys: Set[String] = Set()
 
@@ -159,3 +161,4 @@ object KeyManager {
     Full(key).filter(validKeys.contains) ?~ "Key not found"
   }
 }
+*/
