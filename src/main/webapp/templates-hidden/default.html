@@ -9,7 +9,15 @@
     <script id="json" src="/classpath/json.js" />
     <script type="text/javascript" src="/scripts/jquery.cookie.js"></script>
     <script type="text/javascript" src="/scripts/afglib.js"/>
-    <script type="text/javascript" src="/scripts/afginit.js"/>
+    <script type="text/javascript">
+      // <![CDATA[
+        jQuery(document).ready(function() {
+          try {
+          document.getElementById('loc').value = getSearchLoc();
+         } catch (e) {}
+         });
+      // ]]>
+    </script>
   </head>
   
   <body> <!-- onload="document.getElementById('loc').value=getSearchLoc()"> -->

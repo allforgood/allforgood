@@ -105,7 +105,7 @@ div.columnContainerSearch div.leftColumn {
 	width: 280px;
 }
 div.columnContainerSearch div.rightColumn {
-	margin: 0 35px 0 0;
+	margin: 0 35px 180px 0;
 	width: 600px;
 }
 
@@ -290,14 +290,14 @@ div.searchBoxSmall form #find {
 	width: 60px;
 }
 /* search Results */
-.searchResult {
+.searchResults {
 	font-family: Arial, sans-serif;
 	margin-bottom: 18px;
 }
-.searchResult * {
+.searchResults * {
 	line-height: 1;
 }
-.searchResult .resultLabel {
+.searchResults .resultLabel {
 	color: #6a6a6a;
 	display: inline-block;
 	font-family: Arial, sans-serif;
@@ -305,7 +305,7 @@ div.searchBoxSmall form #find {
 	padding: 0 5px 5px 0;
 	vertical-align: top;
 }
-.searchResult .resultInfo {
+.searchResults .resultInfo {
 	border-bottom: solid 1px #999;
 	display: inline-block;
 	padding: 0 0 12px 0;

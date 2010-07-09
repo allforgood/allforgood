@@ -94,6 +94,8 @@ class Boot {
 
 
     S.addAround(DB.buildLoanWrapper)
+
+    ActorPing.schedule(lib.DataLoader.loadStatic _, 15 seconds)
   }
 
   /**
