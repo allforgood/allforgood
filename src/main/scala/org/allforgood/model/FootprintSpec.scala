@@ -1,6 +1,8 @@
 package org.allforgood
 package model
 
+import lib.JSONAble
+
 import org.joda.time.{DateTime => JTD}
 import xml.Node
 import net.liftweb.util.Helpers
@@ -295,7 +297,7 @@ case class VolunteerOpportunity(
   description:Option[String],
   lastUpdated:Option[DateTimeOlsonDefaultPacific],
   expires:Option[DateTimeOlsonDefaultPacific]
-) {
+) extends JSONAble {
   def source: Option[FeedInfo] = None
 }
 

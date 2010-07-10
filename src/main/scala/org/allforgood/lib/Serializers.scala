@@ -43,3 +43,22 @@ object Serializers {
   }
   
 }
+
+trait JSONAble
+
+import net.liftweb._
+import json._
+import JsonAST._
+
+object JSONAble {
+  implicit val formats = Serialization.formats(NoTypeHints)
+  
+  implicit def toJValue(in: JSONAble): JValue = {
+    Extraction.decompose(in)
+  }
+
+  def str(jv: JValue): String = Printer.pretty(JsonAST.render((jv)))
+  def jv(str: String): JValue = JsonParser.parse(str)
+
+  implicit def fromJValue[T <: JSONAble](jv: JValue)(implicit man: Manifest[T]): T = jv.extract[T]
+}

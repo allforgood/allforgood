@@ -24,9 +24,11 @@ object MenuData extends DispatchSnippet {
   def contact = "Contact"
   def faq = "faq"
   def tos = "tos"
+  def admin = "Admin"
 
   lazy val nameSet = Set(
     home,
+    admin,
     apiDocs,
     xmlUpload,
     search,
@@ -38,9 +40,13 @@ object MenuData extends DispatchSnippet {
   private lazy val ifSuperUser = If(model.User.superUser_? _, 
                                   S ? "You must be a super user")
 
+  private lazy val ifLoggedIn = If(model.User.loggedIn_? _, 
+                                  S ? "You must be logged in")
+
       // Build SiteMap
   def siteMap(): SiteMap = SiteMap(
     List(Menu.i(home) / "index",
+         Menu.i(admin) / "admin" >> ifLoggedIn,
          Menu(apiDocs, S ? "API Docs") / "docs" / "api",
          Menu(xmlUpload, "XML Upload") / "xml_upload" >>
          XmlUploadSnippet.menuParams,
@@ -50,9 +56,9 @@ object MenuData extends DispatchSnippet {
          Menu(contact, S ? "Contact Us") / "contact",
          Menu(faq, S ? "faq") / "faq",
          Menu(tos, S ? "Terms of Service") / "tos",
-       Menu("Manage Users", S ? "Manage Users") / "manage_users" >>
-       ifSuperUser) :::
-    model.User.menus :_*)
+         Menu("Manage Users", S ? "Manage Users") / "manage_users" >>
+         ifSuperUser) :::
+         model.User.menus :_*)
 
   def dispatch = {
     case x if nameSet.contains(x) => 

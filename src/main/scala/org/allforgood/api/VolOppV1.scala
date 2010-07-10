@@ -12,8 +12,8 @@ package api
 import model._
 import org.joda.time.format.DateTimeFormat
 import scala.xml.Elem
-import net.liftweb.json.JsonAST._
-import net.liftweb.json.ShortTypeHints
+//import net.liftweb.json.JsonAST._
+//import net.liftweb.json.ShortTypeHints
 import net.liftweb.util.Helpers._
 
 sealed class BoolOrString

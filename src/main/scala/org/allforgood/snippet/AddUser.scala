@@ -13,7 +13,7 @@ import Helpers._
 import model._
 
 object AddUser extends LiftScreen {
-  object user extends ScreenVar(User.create.verified(true))
+  object user extends ScreenVar(User.create.verified(true).validated(true))
 
   _register(() => user.firstName)
   _register(() => user.lastName)
@@ -28,7 +28,7 @@ object AddUser extends LiftScreen {
                     Mailer.PlainMailBodyType(
 """We've created an administrative account for you on All for Good.
 
-Please click "+S.hostAndPort+"/user_mgt/lost_password to set a password
+Please click """+S.hostAndPath+"""/user_mgt/lost_password to set a password
 """))
     user.is.save
   }

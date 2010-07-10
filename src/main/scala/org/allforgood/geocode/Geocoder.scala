@@ -37,7 +37,9 @@ object Geocoder {
     (key :: jval :: _) =  line.roboSplit("=").map(_.trim)
     decoded = urlDecode(jval)
   } {
-    if (decoded == "Empty") cache += urlDecode(key) -> Empty
+    if (decoded == "Empty") {
+      // cache += urlDecode(key) -> Empty
+    }
     else {
       for {
         json <- tryo(parse(decoded))
@@ -57,18 +59,22 @@ object Geocoder {
       cache.get(key) openOr {
         val encoder = new Geocoder
         val ret = encoder.getGeoLocation(in)
-        cache += key -> ret
-
-        import net.liftweb.json.Serialization.{read, write}
-        implicit def formats = Serialization.formats(NoTypeHints)
-
-        val fr = new PrintWriter(new FileOutputStream(new File("geocache.txt"), true))
-        fr.println(urlEncode(key)+"="+(ret match {
-          case Full(geo) => urlEncode(write(geo))
-
-          case _ => "Empty"
-        }))
-        fr.close()
+        ret.foreach {
+          value => {
+            cache += key -> Full(value)
+            
+            import net.liftweb.json.Serialization.{read, write}
+            implicit def formats = Serialization.formats(NoTypeHints)
+            
+            val fr = new PrintWriter(new FileOutputStream(new File("geocache.txt"), true))
+            fr.println(urlEncode(key)+"="+(ret match {
+              case Full(geo) => urlEncode(write(geo))
+              
+              case _ => "Empty"
+            }))
+            fr.close()
+          }
+        }
 
         ret
       }

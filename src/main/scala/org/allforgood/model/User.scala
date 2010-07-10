@@ -28,6 +28,8 @@ object User extends User with MetaMegaProtoUser[User] {
   }
 
   override def beforeCreate = firstSuper _ :: super.beforeCreate
+
+  override def emailFrom = "admin@allforgood.org"
 }
 
 /**

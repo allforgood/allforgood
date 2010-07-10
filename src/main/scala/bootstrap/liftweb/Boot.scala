@@ -43,7 +43,8 @@ class Boot {
       DB.defineConnectionManager(DefaultConnectionIdentifier, vendor)
     }
 
-    Schemifier.schemify(true, Schemifier.infoF _, User)
+    Schemifier.schemify(true, Schemifier.infoF _, User, 
+                        OppStore, GeoDB)
 
 
     if (Props.testMode) {
