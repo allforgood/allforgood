@@ -6,20 +6,20 @@ class AllForGoodProject(info: ProjectInfo) extends DefaultWebProject(info) {
   val scalatools_snapshot = "Scala Tools Snapshot" at "http://scala-tools.org/repo-snapshots/"
   val scalatools_release = "Scala Tools Release" at "http://scala-tools.org/repo-releases/"
 
-  val liftVersion = "2.0-scala280-SNAPSHOT"
+  val liftVersion = "2.1-SNAPSHOT"
 
   override def scanDirectories = Nil
 
   override def libraryDependencies = Set(
-    "net.liftweb" % "lift-webkit" % liftVersion % "compile->default",
-    "net.liftweb" % "lift-mapper" % liftVersion % "compile->default",
-    "net.liftweb" % "lift-testkit" % liftVersion % "compile->default",
+    "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
+    "net.liftweb" %% "lift-mapper" % liftVersion % "compile->default",
+    "net.liftweb" %% "lift-testkit" % liftVersion % "compile->default",
     "org.apache.lucene" % "lucene-core" % "3.0.1" % "compile",
 
     "org.mortbay.jetty" % "jetty" % "6.1.22" % "test",
     "com.h2database" % "h2" % "1.2.134",
     "junit" % "junit" % "4.7" % "test",
-    "org.scala-tools.testing" % "specs_2.8.0.RC6" % "1.6.5-SNAPSHOT" % "test",
+    "org.scala-tools.testing" %% "specs" % "1.6.5" % "test",
 
     "joda-time" % "joda-time" % "1.6"
   ) ++ super.libraryDependencies
