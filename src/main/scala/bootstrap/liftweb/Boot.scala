@@ -27,15 +27,13 @@ import api._
  * to modify lift's environment
  */
 class Boot {
-  //implicit def toFunc(in: {def render(in: NodeSeq): NodeSeq}):
-  // NodeSeq => NodeSeq = param => in.render(param)
-    
   def boot {
     if (!DB.jndiJdbcConnAvailable_?) {
       val vendor = 
 	new StandardDBVendor(Props.get("db.driver") openOr "org.h2.Driver",
 			     Props.get("db.url") openOr 
-			     "jdbc:h2:lift_proto.db;AUTO_SERVER=TRUE",
+			     (if (Props.testMode) "jdbc:h2:mem:afg;AUTO_SERVER=TRUE"
+                               else "jdbc:h2:lift_proto.db;AUTO_SERVER=TRUE"),
 			     Props.get("db.user"), Props.get("db.password"))
 
       LiftRules.unloadHooks.append(vendor.closeAllConnections_! _)
@@ -44,7 +42,7 @@ class Boot {
     }
 
     Schemifier.schemify(true, Schemifier.infoF _, User, 
-                        OppStore, GeoDB)
+                        OppStore, GeoDB, DateTimeDB, TagStoreDB)
 
 
     if (Props.testMode) {

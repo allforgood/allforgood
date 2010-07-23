@@ -76,15 +76,11 @@ private class DiskOpportunityStore extends OpportunityStore {
     OppStore.find(By(OppStore.key, guid.guid)).foreach(_.delete_!)
 }
 
-class GeoDB extends LongKeyedMapper[GeoDB] with IdPK {
+class GeoDB extends LongKeyedMapper[GeoDB] with IdPK with GUIDKey {
   import json._
   private implicit def formats = Serialization.formats(NoTypeHints)
 
   def getSingleton = GeoDB
-
-  object key extends MappedString(this, 256) {
-    override def dbIndexed_? = true
-  }
 
   object value extends MappedText(this)
 
@@ -176,30 +172,33 @@ private class DiskGeoStore extends GeoStore {
   map(g => GUID(g.key))
 }
 
-/*
-private object MemoryDateTimeStore extends MemoryDateTimeStore
+
+private object DBDateTimeStore extends DBDateTimeStore
 
 /**
  * The interface to the Date Time filter search
  */
-private class MemoryDateTimeStore extends DateTimeStore {
-  private var info: Map[GUID, List[DateTimeDuration]] = Map()
-
+private class DBDateTimeStore extends DateTimeStore {
   /**
    * Assocate the GUID and times
    */
-  def add(guid: GUID, times: List[DateTimeDuration]): Unit = 
-    synchronized {
-      info += guid -> times
+  def add(guid: GUID, times: List[DateTimeDuration]): Unit = {
+    DB.use(DefaultConnectionIdentifier) {
+      xx =>
+        DateTimeDB.bulkDelete_!!(By(DateTimeDB.key, guid.guid))
+        for {
+          t <- times
+          start <- t.startDate
+          end <- t.endDate
+        } DateTimeDB.create.key(guid.guid).startTime(start).endTime(end).save
     }
+  }
+    
 
   /**
    * Unassocate the GUID and the times
    */
-  def remove(guid: GUID): Unit = 
-    synchronized {
-      info -= guid
-    }
+  def remove(guid: GUID): Unit = DateTimeDB.bulkDelete_!!(By(DateTimeDB.key, guid.guid))
 
   /**
    * Update the times of a given GUID
@@ -214,18 +213,14 @@ private class MemoryDateTimeStore extends DateTimeStore {
   def find(start: Long, end: Long): List[(GUID, Long)] = {
     val ctm = AfgDate.afgnow.getMillis
 
-    def test(in: List[DateTimeDuration]): List[Long] = 
-      in.collect {
-        case DateTimeDuration(_, Some(startTime), Some(endTime), _, _, _, _, _, _) 
-        if startTime <= end && endTime >= start && startTime >= ctm
-        => startTime - ctm
-      }.sortWith(_ < _).take(1)
-
-    val m = synchronized(info)
-    (for {
-      (guid, durs) <- m.view
-      dur <- test(durs)
-    } yield guid -> (dur - start)).toList
+    DateTimeDB.findAll(By_>(DateTimeDB.startTime, ctm),
+                       By_<(DateTimeDB.endTime, ctm)).
+    map(dtb => dtb.key.is -> (ctm - dtb.startTime)).
+    sortWith(_._2 < _._2).foldLeft[(Set[String], List[(String, Long)])](
+      Set() -> Nil){
+        case ((set, list), (key, len)) if !set.contains(key) => (set + key) -> ((key -> len) :: list)
+        case (sl, _) => sl
+      }._2.map{ case (key, len) => GUID(key) -> len}
   }
 
   /**
@@ -233,19 +228,9 @@ private class MemoryDateTimeStore extends DateTimeStore {
    * TODO: rename to "contains" ?
    */
   def test(start: Long, end: Long)(guid: GUID):Boolean = {
-    def testIt(it: DateTimeDuration): Boolean = {
-      (it.startDate, it.endDate) match {
-        case (Some(st), Some(en)) => start < en && end >= st
-        case (_, Some(en)) => start < en
-        case (Some(st), _) => end >= st
-        case _ => true
-      }
-    }
-
-    (for {
-      lst <- synchronized(info).get(guid)
-      i <- lst.find(testIt _)
-    } yield true) getOrElse false
+    DateTimeDB.find(By(DateTimeDB.key, guid.guid),
+                    By_<(DateTimeDB.startTime, end),
+                    By_>(DateTimeDB.endTime, start)).isDefined
   }
 }
 
@@ -253,25 +238,21 @@ private class MemoryDateTimeStore extends DateTimeStore {
 /**
  * The in-memory implementation of the tag store
  */
-private object MemoryTagStore extends MemoryTagStore
+private object DBTagStore extends DBTagStore
 
-private class MemoryTagStore extends TagStore {
-  import scala.collection.immutable.{TreeMap, TreeSet, SortedSet}
-
-  private var tags: TreeMap[Tag, TreeSet[GUID]] = TreeMap()
-  private var guids: TreeMap[GUID, Set[Tag]] = TreeMap()
-
+private class DBTagStore extends TagStore {
   /**
    * Assocate the GUID and a set of tags
    */
-  def add(guid: GUID, tagsToAdd: List[Tag]): Unit = synchronized {
-    remove(guid)
-    val realTags = TreeSet(tagsToAdd :_*)
-    guids += guid -> realTags
-    for {
-      tag <- realTags
-    } tags += tag -> (tags.getOrElse(tag, TreeSet(guid)) + guid)
-  }
+  def add(guid: GUID, tagsToAdd: List[Tag]): Unit = 
+    DB.use(DefaultConnectionIdentifier) {
+      xx => {
+        TagStoreDB.bulkDelete_!!(By(TagStoreDB.key, guid.guid))
+        for {
+          t <- tagsToAdd
+        } TagStoreDB.create.key(guid.guid).tag(t.tag).save
+      }
+    }
 
   /**
    * Unassocate the GUID and the tags
@@ -310,15 +291,15 @@ private class MemoryTagStore extends TagStore {
 	     }
 }
 
-private object MemoryLuceneStore extends MemoryLuceneStore
+private object DiskLuceneStore extends DiskLuceneStore
 
 /**
  * THe interface for storing stuff in a search engine
  */
-private class MemoryLuceneStore extends SearchStore {
+private class DiskLuceneStore extends SearchStore {
   private val guid = GUID.create
 
-  override def toString = "MemoryLuceneStore "+guid
+  override def toString = "DiskLuceneStore "+guid
 
   import java.io.IOException;
   import java.io.StringReader;
@@ -332,14 +313,8 @@ private class MemoryLuceneStore extends SearchStore {
   import org.apache.lucene.util.Version
   import org.apache.lucene.queryParser.QueryParser
 
-
-  /*
-   import org.apache.lucene.queryParser.QueryParser;
-   import org.apache.lucene.queryParser.ParseException;
-   import org.apache.lucene.analysis.standard.StandardAnalyzer;
-   */
-
   private val idx = {
+    // FIXME -- disk directory
     val rd = new RAMDirectory()
     val writer = new IndexWriter(rd, new StandardAnalyzer(Version.LUCENE_30),
                                  true, IndexWriter.MaxFieldLength.UNLIMITED)
@@ -445,5 +420,3 @@ private class MemoryLuceneStore extends SearchStore {
     }
   }
 }
-
-*/
