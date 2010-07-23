@@ -60,5 +60,7 @@ object JSONAble {
   def str(jv: JValue): String = Printer.pretty(JsonAST.render((jv)))
   def jv(str: String): JValue = JsonParser.parse(str)
 
-  implicit def fromJValue[T <: JSONAble](jv: JValue)(implicit man: Manifest[T]): T = jv.extract[T]
+  implicit def fromJValue[T <: JSONAble](jv: JValue)(implicit man: Manifest[T]): T = {
+      jv.extract[T]
+  }
 }

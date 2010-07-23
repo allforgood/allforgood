@@ -7,9 +7,10 @@ import util._
 import common._
 
 trait GUIDKey {
-  self: BaseMapper with Mapper[_] =>
+  self: BaseMapper =>
     
-  object key extends MappedString[MapperType](this, 256) {
+  object key extends MappedString[MapperType](this.asInstanceOf[MapperType],
+                                              256) {
     override def dbIndexed_? = true
   }
 }

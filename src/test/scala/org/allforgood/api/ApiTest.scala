@@ -42,8 +42,6 @@
     "api" should {
 
       "Give a 401 without a key" in {
-        println("*** Testing 401 ***")
-
         get("/api/volopps", "q" -> "hunger").map(_.code) must_== Full(401)
       }
 
@@ -196,7 +194,7 @@
        val desc =  (channel \ "description").text
        val items = (channel \ "item")
        val opps =  items.map(parseVolOpp).toList
-       println(lBD, vers, lang, link, desc, items.length,opps.length)
+
        tryo(RetV1(lBD, vers, lang, link, desc, opps))
     }
 
@@ -213,6 +211,7 @@
     
     def later(days: Int):String = AfgDate.dateFormatter.print((new DateTime("2010-05-08").plusDays(days)))
     
+    /*
     def showRes(name: String)(res: Box[RetV1]) {
       res match {
         case Full(v1) => {
@@ -221,7 +220,7 @@
         
         case x => println(name+": "+x)
       }
-    }
+    }*/
                                                             
 
 def testParams(f: Box[Box[RetV1] => Unit], p: (String, Any)*)(countTest: Int => Unit) {
@@ -313,6 +312,8 @@ def searchForSpecificDates = {
   val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest",
                              "vol_startdate" -> fmt.print(plus7), "vol_enddate" -> fmt.print(plus14)).open_!
 
+  println("Got "+ret)
+
   val count = 0
   ret.items.length must be > count
   
@@ -325,6 +326,9 @@ def searchForSpecificDates = {
 // Search by zip code - always assumes there are events in 94117 (San Francisco)
 def searchForZip = {
   val ret = submitApiRequest( viaJson _, "output" -> "json", "key" -> "UnitTest", "vol_loc" -> "94117" ).open_!
+
+  println("Got 2 "+ret)
+
 
   val count = 0
   ret.items.length must be > count

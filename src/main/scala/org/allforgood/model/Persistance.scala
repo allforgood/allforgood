@@ -19,6 +19,17 @@ object PersistenceFactory extends Factory {
   val store = new FactoryMaker[Store](DefaultStore){}
 
   val dateTimeStore = new FactoryMaker[DateTimeStore](() => MemoryDateTimeStore){}
+
+  /*
+  val opportunityStore = new FactoryMaker[OpportunityStore](() => DiskOpportunityStore) {}
+  val geoStore = new FactoryMaker[GeoStore](() => DiskGeoStore){}
+  val tagStore = new FactoryMaker[TagStore](() => DiskTagStore){}
+  val searchStore = new FactoryMaker[SearchStore](() => DiskLuceneStore){} 
+
+  val store = new FactoryMaker[Store](DefaultStore){}
+
+  val dateTimeStore = new FactoryMaker[DateTimeStore](() => DiskDateTimeStore){}
+  */
 }
 
 trait Store {
@@ -51,8 +62,8 @@ trait Store {
     val filter: GUID => Boolean = timeperiod match {
       case Some((st, en)) if st.getMillis >= afgnow.getMillis &&
       st.getMillis < en.getMillis =>
-            dateTime.test(st.getMillis, en.getMillis) _
-        
+        dateTime.test(st.getMillis, en.getMillis) _
+      
       case _ => x => true // (afgnow.plusDays(1)) -> (afgnow.plusDays(1000))
       }
 
@@ -89,8 +100,9 @@ trait Store {
     }
       
     (query, loc) match {
-      case (Some(q), None) => search.find(q, filter, start, num)
-      
+      case (Some(q), None) => 
+        search.find(q, filter, start, num)
+            
       case (None, Some(geoLocation)) => {
         geoFind(geoLocation, start, num).sortWith {
           _._2 > _._2

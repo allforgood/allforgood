@@ -221,7 +221,7 @@ case class Location(
 
   def toGeoLocation: Box[GeoLocation] = 
     (virtual, latitude, longitude) match {
-    case (Some(Yes), _, _) => Full(GeoLocation(0,0, false))
+    case (Some(YesNoEnum.Yes), _, _) => Full(GeoLocation(0,0, false))
     case (_, Some(lat), Some(long)) => Full(GeoLocation(long, lat, true))
       
       case _ => Geocoder(streetAddress1 ::
@@ -465,9 +465,8 @@ case class DateTimeOlsonDefaultPacific(dateTimeNoTZ:String)
 
 case class TimeOlson(time:String, olsonTZ:Option[String])
 
-sealed trait YesNoEnum {
-  def value: String
-}
+final case class YesNoEnum(value: String)
+
 object YesNoEnum {
   def fromXML(node: scala.xml.Node) = node.text.toLowerCase match {
     case "yes" => Some(Yes)
@@ -475,14 +474,14 @@ object YesNoEnum {
     case _ => None
   }
 
+  val Yes = new YesNoEnum("Yes")
+  val No = new YesNoEnum("No")
 }
 
-case object Yes extends YesNoEnum { val value = "Yes" }
-case object No extends YesNoEnum { val value = "No" }
+//final case class Yes() extends YesNoEnum { val value = "Yes" }
+//final case class No() extends YesNoEnum { val value = "No" }
 
-sealed trait SexRestrictedEnum {
-  def value: String
-}
+final case class SexRestrictedEnum(value: String)
 
 object SexRestrictedEnum {
   val male_rx = "m(ale|an)?".r
@@ -490,6 +489,7 @@ object SexRestrictedEnum {
 /*  val female_rx = "f(emale)?".r */
 /*  val female_rx = """(f|female|w|woman)""".r */
   val neither_rx = "n(either)?".r
+
   def fromXML(node: scala.xml.Node ) = {
        node.text.toLowerCase.trim match {
     case male_rx(capgroup) => Some(Male)
@@ -498,7 +498,8 @@ object SexRestrictedEnum {
     case _ => None
     }
   }
+
+  val Male = new SexRestrictedEnum("Male")
+  val Female = new SexRestrictedEnum("Female")
+  val Neither = new SexRestrictedEnum("Neither")
 }
-final case object Male extends SexRestrictedEnum { val value = "Male"}
-final case object Female extends SexRestrictedEnum { val value = "Female" }
-final case object Neither extends SexRestrictedEnum { val value = "Neither" }

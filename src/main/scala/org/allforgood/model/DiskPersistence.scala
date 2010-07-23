@@ -4,9 +4,11 @@ package model
 import lib._
 
 import net.liftweb._
-import util.Helpers
+import util._
 import common._
 import mapper._
+
+import java.io.File
 
 /**
  * This file contains an implementation of disk-based persistance
@@ -24,9 +26,14 @@ class OppStore extends LongKeyedMapper[OppStore] with IdPK {
 
   object value extends MappedText(this)
 
-  lazy val opp: VolunteerOpportunity = JSONAble.fromJValue(JSONAble.jv(value))
+  lazy val opp: VolunteerOpportunity = {
+    JSONAble.fromJValue[VolunteerOpportunity](JSONAble.jv(value))
+  }
 
-  def opp(o: VolunteerOpportunity): OppStore = this.value(JSONAble.str(o))
+  def opp(o: VolunteerOpportunity): OppStore = {
+    val str = JSONAble.str(o)
+    this.value(str)
+  }
 }
 
 object OppStore extends OppStore with LongKeyedMetaMapper[OppStore]
@@ -88,10 +95,13 @@ class GeoDB extends LongKeyedMapper[GeoDB] with IdPK with GUIDKey {
     override def dbIndexed_? = true
   }
 
-  lazy val geo: List[GeoLocation] = JsonParser.parse(value).extract
+  lazy val geo: List[GeoLocation] = 
+      JsonParser.parse(value).extract[GeoYakHack].info
 
   def geo(o: List[GeoLocation]): GeoDB = 
-    this.value(JSONAble.str(Extraction.decompose(o)))
+    this.value(JSONAble.str(Extraction.decompose(GeoYakHack(o))))
+
+  final private case class GeoYakHack(info: List[GeoLocation])
 }
 
 object GeoDB extends GeoDB with LongKeyedMetaMapper[GeoDB]
@@ -173,12 +183,12 @@ private class DiskGeoStore extends GeoStore {
 }
 
 
-private object DBDateTimeStore extends DBDateTimeStore
+private object DiskDateTimeStore extends DiskDateTimeStore
 
 /**
  * The interface to the Date Time filter search
  */
-private class DBDateTimeStore extends DateTimeStore {
+private class DiskDateTimeStore extends DateTimeStore {
   /**
    * Assocate the GUID and times
    */
@@ -213,8 +223,8 @@ private class DBDateTimeStore extends DateTimeStore {
   def find(start: Long, end: Long): List[(GUID, Long)] = {
     val ctm = AfgDate.afgnow.getMillis
 
-    DateTimeDB.findAll(By_>(DateTimeDB.startTime, ctm),
-                       By_<(DateTimeDB.endTime, ctm)).
+    DateTimeDB.findAll(By_<(DateTimeDB.startTime, end),
+                       By_>(DateTimeDB.endTime, start)).
     map(dtb => dtb.key.is -> (ctm - dtb.startTime)).
     sortWith(_._2 < _._2).foldLeft[(Set[String], List[(String, Long)])](
       Set() -> Nil){
@@ -228,6 +238,13 @@ private class DBDateTimeStore extends DateTimeStore {
    * TODO: rename to "contains" ?
    */
   def test(start: Long, end: Long)(guid: GUID):Boolean = {
+    println("Testing "+guid+" "+start+"-"+end+" "+
+            DateTimeDB.findAll(By(DateTimeDB.key, guid.guid)))
+
+    println("Match GUID "+DateTimeDB.findAll(By_<(DateTimeDB.startTime, end),
+                                             By_>(DateTimeDB.endTime, start)).
+                                             map(_.key))
+
     DateTimeDB.find(By(DateTimeDB.key, guid.guid),
                     By_<(DateTimeDB.startTime, end),
                     By_>(DateTimeDB.endTime, start)).isDefined
@@ -238,9 +255,9 @@ private class DBDateTimeStore extends DateTimeStore {
 /**
  * The in-memory implementation of the tag store
  */
-private object DBTagStore extends DBTagStore
+private object DiskTagStore extends DiskTagStore
 
-private class DBTagStore extends TagStore {
+private class DiskTagStore extends TagStore {
   /**
    * Assocate the GUID and a set of tags
    */
@@ -257,15 +274,8 @@ private class DBTagStore extends TagStore {
   /**
    * Unassocate the GUID and the tags
    */
-  def remove(guid: GUID): Unit = synchronized {
-    guids.get(guid) match {
-      case Some(toRemove) =>
-        for {
-          tag <- toRemove
-        } tags += tag -> (tags(tag) - guid)
-      case _ =>
-    }
-  }
+  def remove(guid: GUID): Unit = 
+    TagStoreDB.bulkDelete_!!(By(TagStoreDB.key, guid.guid))
 
   /**
    * Update the tags associated with a given GUID
@@ -277,18 +287,17 @@ private class DBTagStore extends TagStore {
    */
   def find(tagsToFind: List[Tag],
            first: Int = 0, max: Int = 200): List[GUID] =
-	     {
-	       val toFind = TreeSet(tagsToFind :_*)
-	       val tg = synchronized {tags}
-
-	       val ret: SortedSet[GUID] = for {
-		 t <- toFind
-		 lst <- tg.get(t).toList
-		 item <- lst
-	       } yield item
-
-	       ret.drop(first).take(max).toList
-	     }
+             TagStoreDB.findMapFieldDb(
+               DefaultConnectionIdentifier,
+               List(TagStoreDB.key),
+               Distinct(),
+               OrderBy(TagStoreDB.key, Ascending),
+               ByList(TagStoreDB.tag, 
+                      tagsToFind.map(_.tag)),
+               MaxRows(max),
+               StartAt(first)) {
+                 ts => Full(GUID(ts.key))
+               }
 }
 
 private object DiskLuceneStore extends DiskLuceneStore
@@ -314,8 +323,18 @@ private class DiskLuceneStore extends SearchStore {
   import org.apache.lucene.queryParser.QueryParser
 
   private val idx = {
-    // FIXME -- disk directory
-    val rd = new RAMDirectory()
+    val rd = new MMapDirectory({
+      if (Props.testMode) {
+        val f = File.createTempFile("foo", "lucene")
+        val f2 = new File(f.getParentFile, f.getName + ".dir")
+        f2.mkdirs()
+        f2
+      } else {
+        val f = new File(Props.get("lucene.dir") openOr "afg_lucene.dir")
+        f.mkdirs()
+        f
+      }
+    })
     val writer = new IndexWriter(rd, new StandardAnalyzer(Version.LUCENE_30),
                                  true, IndexWriter.MaxFieldLength.UNLIMITED)
     writer.optimize

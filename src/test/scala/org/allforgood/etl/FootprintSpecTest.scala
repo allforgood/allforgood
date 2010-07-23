@@ -32,7 +32,7 @@ class FootprintSpecs extends Specification
       <openEnded>No</openEnded> <startDate>2009-02-22</startDate> <endDate>2009-02-22</endDate> <startTime>18:45:00</startTime> <endTime>21:00:00</endTime>
       </dateTimeDuration>
       val item = DateTimeDuration.fromXML(subject)
-      item.openEnded.get must beEqualTo(No)
+      item.openEnded.get must beEqualTo(YesNoEnum.No)
 
       (new JTD(item.startDate.get)).dayOfMonth.get mustEqual 22
       item.endTime.get.olsonTZ must beNone
@@ -208,6 +208,9 @@ class FootprintSpecs extends Specification
                                          </sexRestrictedTo>
                                          </VolunteerOpportunity>).sexRestrictedTo
           }
+
+        import SexRestrictedEnum._
+
         parseSex("m") must beSome(Male)
         parseSex("M") must beSome(Male)
         parseSex("man") must beSome(Male)
